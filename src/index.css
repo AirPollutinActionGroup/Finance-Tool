@@ -467,6 +467,17 @@ a {
   background: var(--brand-hover);
 }
 
+.table-cell-title {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.table-cell-subtitle {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+
 .simulation-controls {
   display: grid;
   gap: 16px;

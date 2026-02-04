@@ -54,9 +54,37 @@ const DonorDetailPage = () => {
     geography,
     cities: Array.from(cities),
   }));
-  const allocatedEmployees = employees.filter((employee) =>
-    donor.preferences.some((preference) => preference.programId === employee.programId)
+  const employeesByProgram = employees.reduce<Record<string, typeof employees>>(
+    (acc, employee) => {
+      acc[employee.programId] ??= [];
+      acc[employee.programId].push(employee);
+      return acc;
+    },
+    {}
   );
+  const allocatedEmployees = employees.filter((employee) =>
+    donor.preferences.some(
+      (preference) => preference.programId === employee.programId
+    )
+  );
+  const allocatedEmployeeRows = allocatedEmployees.map((employee) => {
+    const preference = donor.preferences.find(
+      (item) => item.programId === employee.programId
+    );
+    const programName =
+      programs.find((program) => program.id === employee.programId)?.name ??
+      "Program";
+    const totalInProgram = employeesByProgram[employee.programId]?.length ?? 1;
+    const allocationPercent = preference
+      ? preference.weight / totalInProgram
+      : 0;
+
+    return {
+      employee,
+      programName,
+      allocationPercent,
+    };
+  });
   const recentMoves = donorMovementEvents.filter(
     (event) => event.donorId === donor.id
   );
@@ -161,24 +189,23 @@ const DonorDetailPage = () => {
               <thead>
                 <tr>
                   <th>Employee</th>
-                  <th>Role</th>
-                  <th>Program</th>
+                  <th>Allocation %</th>
                 </tr>
               </thead>
               <tbody>
-                {allocatedEmployees.map((employee) => {
-                  const programName =
-                    programs.find((program) => program.id === employee.programId)
-                      ?.name ?? "Program";
-
-                  return (
-                    <tr key={employee.id}>
-                      <td>{employee.name}</td>
-                      <td>{employee.role}</td>
-                      <td>{programName}</td>
-                    </tr>
-                  );
-                })}
+                {allocatedEmployeeRows.map((row) => (
+                  <tr key={row.employee.id}>
+                    <td>
+                      <div className="table-cell-title">
+                        {row.employee.name}
+                      </div>
+                      <div className="table-cell-subtitle">
+                        {row.employee.role} · {row.programName}
+                      </div>
+                    </td>
+                    <td>{formatPercent(row.allocationPercent)}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
