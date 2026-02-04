@@ -478,6 +478,12 @@ a {
   margin-top: 4px;
 }
 
+.table-note {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  margin: 4px 0 12px;
+}
+
 .simulation-controls {
   display: grid;
   gap: 16px;
