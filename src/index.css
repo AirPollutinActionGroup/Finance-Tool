@@ -1,16 +1,23 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 :root {
-  color-scheme: light;
-  --bg: #e6ecec;
-  --card: #ffffff;
-  --ink: #1f2e2e;
-  --ink-soft: rgba(31, 46, 46, 0.72);
-  --border: rgba(50, 70, 70, 0.12);
-  --border-strong: rgba(50, 70, 70, 0.2);
+  color-scheme: dark;
+  --bg: #1f2e2e;
+  --bg-secondary: #283c3c;
+  --bg-tertiary: #324646;
+  --card: #355050;
+  --panel: #2d4444;
+  --ink: #e6ecec;
+  --ink-soft: #b0c0c0;
+  --border: rgba(50, 70, 70, 0.6);
+  --border-strong: rgba(50, 70, 70, 0.9);
   --brand: #fddc00;
-  --shadow-soft: 0 10px 30px rgba(31, 46, 46, 0.08);
-  --shadow-tight: 0 6px 16px rgba(31, 46, 46, 0.08);
+  --brand-hover: #e6c300;
+  --brand-active: #d6af00;
+  --success: #3fbf7f;
+  --warning: #fddc00;
+  --shadow-soft: 0 14px 36px rgba(0, 0, 0, 0.28);
+  --shadow-tight: 0 8px 22px rgba(0, 0, 0, 0.28);
   --radius-lg: 16px;
   --radius-md: 12px;
   --radius-sm: 8px;
@@ -66,7 +73,7 @@ a {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(40, 60, 60, 0.92);
   border-bottom: 1px solid var(--border);
   backdrop-filter: blur(12px);
 }
@@ -137,8 +144,9 @@ a {
   padding: 6px 12px;
   border-radius: 999px;
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--panel);
   font-size: 0.85rem;
+  color: var(--ink-soft);
 }
 
 .tabs {
@@ -147,7 +155,7 @@ a {
 
 .tab {
   border: 1px solid var(--border-strong);
-  background: var(--card);
+  background: var(--panel);
   color: var(--ink);
   padding: 8px 14px;
   border-radius: 999px;
@@ -158,12 +166,14 @@ a {
 
 .tab.active {
   background: var(--brand);
-  border-color: rgba(0, 0, 0, 0.08);
+  border-color: var(--brand-active);
+  color: #1f2e2e;
 }
 
 .tab:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-tight);
+  background: var(--bg-tertiary);
 }
 
 .carousel {
@@ -174,13 +184,14 @@ a {
 
 .carousel-button {
   border: 1px solid var(--border-strong);
-  background: var(--card);
+  background: var(--panel);
   border-radius: 999px;
   width: 36px;
   height: 36px;
   cursor: pointer;
   transition: all var(--transition);
   box-shadow: var(--shadow-tight);
+  color: var(--ink);
 }
 
 .carousel-button:hover {
@@ -369,6 +380,7 @@ a {
   justify-content: center;
   color: var(--ink-soft);
   border-style: dashed;
+  border-color: var(--border-strong);
 }
 
 .data-table {
@@ -443,6 +455,8 @@ a {
   padding: 6px 8px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--ink);
 }
 
 .insight-columns {
