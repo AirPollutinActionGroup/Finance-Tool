@@ -27,6 +27,15 @@ const DonorDetailPage = () => {
       weight: preference.weight,
     };
   });
+  const totalWeight = donor.preferences.reduce(
+    (sum, preference) => sum + preference.weight,
+    0
+  );
+  const unallocatedWeight = Math.max(0, 100 - totalWeight);
+  const topPreference = preferenceSummaries.reduce(
+    (max, current) => (current.weight > max.weight ? current : max),
+    preferenceSummaries[0] ?? { programName: "None", weight: 0 }
+  );
 
   return (
     <section className="page-section">
@@ -51,6 +60,23 @@ const DonorDetailPage = () => {
           <div className="detail-row">
             <span>Preferences</span>
             <span>{donor.preferences.length} allocations</span>
+          </div>
+        </section>
+        <section className="detail-card">
+          <h2>Metrics</h2>
+          <div className="detail-row">
+            <span>Total preference weight</span>
+            <span>{totalWeight}%</span>
+          </div>
+          <div className="detail-row">
+            <span>Unallocated weight</span>
+            <span>{unallocatedWeight}%</span>
+          </div>
+          <div className="detail-row">
+            <span>Top preference</span>
+            <span>
+              {topPreference.programName} ({topPreference.weight}%)
+            </span>
           </div>
         </section>
         <section className="detail-card">

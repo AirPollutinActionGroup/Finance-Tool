@@ -40,9 +40,18 @@ const EmployeeDetailPage = () => {
             <span>Region</span>
             <span>{employee.geography}</span>
           </div>
+        </section>
+        <section className="detail-card">
+          <h2>Metrics</h2>
           <div className="detail-row">
             <span>Monthly cost</span>
             <span>INR {employee.monthlyCost.toLocaleString("en-IN")}</span>
+          </div>
+          <div className="detail-row">
+            <span>Annual cost</span>
+            <span>
+              INR {(employee.monthlyCost * 12).toLocaleString("en-IN")}
+            </span>
           </div>
         </section>
         <section className="detail-card">
