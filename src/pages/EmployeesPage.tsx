@@ -1,3 +1,4 @@
+import EmployeeCard from "../components/EmployeeCard";
 import { employees } from "../data/mockData";
 
 const EmployeesPage = () => {
@@ -16,16 +17,7 @@ const EmployeesPage = () => {
         <ul className="employee-list">
           {employees.map((employee) => (
             <li key={employee.id} className="employee-list-item">
-              <div className="employee-list-primary">
-                <h2>{employee.name}</h2>
-                <p>{employee.role}</p>
-              </div>
-              <div className="employee-list-secondary">
-                <span>{employee.geography}</span>
-                <span>
-                  INR {employee.monthlyCost.toLocaleString("en-IN")}/mo
-                </span>
-              </div>
+              <EmployeeCard employee={employee} />
             </li>
           ))}
         </ul>
