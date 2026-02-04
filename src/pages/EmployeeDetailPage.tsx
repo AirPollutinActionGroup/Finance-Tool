@@ -22,9 +22,11 @@ const EmployeeDetailPage = () => {
     programs.find((item) => item.id === employee.programId)?.name ??
     "Unassigned";
 
-  // Calculate CTC
-  const monthlyCTC = employee.monthlySalary + employee.pfContribution;
-  const annualCTC = monthlyCTC * 12;
+  // Calculate annual figures
+  const annualSalary = employee.monthlySalary * 12;
+  const annualPF = employee.pfContribution * 12;
+  const annualTDS = employee.tdsDeduction * 12;
+  const annualCTC = annualSalary + annualPF;
 
   // Calculate donor contributions using same logic as DonorDetailPage
   const referenceDate = new Date(Date.UTC(2025, 0, 1));
@@ -131,30 +133,20 @@ const EmployeeDetailPage = () => {
         <section className="detail-card">
           <h2>Compensation</h2>
           <div className="detail-row">
-            <span>Monthly salary</span>
-            <span>{formatCurrency(employee.monthlySalary)}</span>
+            <span>Annual salary</span>
+            <span>{formatCurrency(annualSalary)}</span>
           </div>
           <div className="detail-row">
-            <span>PF contribution</span>
-            <span>{formatCurrency(employee.pfContribution)}</span>
-          </div>
-          <div className="detail-row">
-            <span>Monthly CTC</span>
-            <span>{formatCurrency(monthlyCTC)}</span>
+            <span>Annual PF contribution</span>
+            <span>{formatCurrency(annualPF)}</span>
           </div>
           <div className="detail-row">
             <span>Annual CTC</span>
             <span>{formatCurrency(annualCTC)}</span>
           </div>
           <div className="detail-row">
-            <span>TDS deduction</span>
-            <span>{formatCurrency(employee.tdsDeduction)}</span>
-          </div>
-          <div className="detail-row">
-            <span>Annual salary</span>
-            <span>
-              {formatCurrency(employee.monthlySalary * 12)}
-            </span>
+            <span>Annual TDS deduction</span>
+            <span>{formatCurrency(annualTDS)}</span>
           </div>
         </section>
         <section className="detail-card">
