@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { donors, employees, programs } from "../data/mockData";
 import { ADMIN_RATE_BY_TYPE, runSimulation } from "../simulation/engine";
+import { formatCurrency, formatDate, formatPercent } from "../utils/format";
 
 const movementEvents = [
   {
@@ -69,7 +70,7 @@ const DashboardPage = () => {
         </div>
         <div className="metric-card">
           <h3>Overall balance left</h3>
-          <p>INR {simulation.generalFundTotal.toLocaleString("en-IN")}</p>
+          <p>{formatCurrency(simulation.generalFundTotal)}</p>
         </div>
         <div className="metric-card">
           <h3>Runway</h3>
@@ -80,38 +81,68 @@ const DashboardPage = () => {
       <div className="dashboard-grid">
         <section className="detail-card">
           <h2>Recent joins</h2>
-          <ul className="detail-list">
-            {recentJoins.map((employee) => (
-              <li key={employee.id} className="detail-list-item">
-                <span>{employee.name}</span>
-                <span>{employee.joiningDate}</span>
-              </li>
-            ))}
-          </ul>
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Joined</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentJoins.map((employee) => (
+                  <tr key={employee.id}>
+                    <td>{employee.name}</td>
+                    <td>{formatDate(employee.joiningDate)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <section className="detail-card">
           <h2>Movement feed</h2>
-          <ul className="detail-list">
-            {movementEvents.map((event) => (
-              <li key={event.id} className="detail-list-item">
-                <span>{event.summary}</span>
-                <span>{event.date}</span>
-              </li>
-            ))}
-          </ul>
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Update</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {movementEvents.map((event) => (
+                  <tr key={event.id}>
+                    <td>{event.summary}</td>
+                    <td>{formatDate(event.date)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <section className="detail-card">
           <h2>Donors near admin threshold</h2>
-          <ul className="detail-list">
-            {adminWatchlist.map((donor) => (
-              <li key={donor.id} className="detail-list-item">
-                <span>{donor.name}</span>
-                <span>{donor.adminOverheadPercent}%</span>
-              </li>
-            ))}
-          </ul>
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Donor</th>
+                  <th>Admin %</th>
+                </tr>
+              </thead>
+              <tbody>
+                {adminWatchlist.map((donor) => (
+                  <tr key={donor.id}>
+                    <td>{donor.name}</td>
+                    <td>{formatPercent(donor.adminOverheadPercent)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       </div>
     </section>

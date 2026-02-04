@@ -1,5 +1,6 @@
 import { NavLink, useParams } from "react-router-dom";
 import { donors, employees, programs } from "../data/mockData";
+import { formatCurrency, formatPercent } from "../utils/format";
 
 const ProgramDetailPage = () => {
   const { programId } = useParams();
@@ -69,40 +70,64 @@ const ProgramDetailPage = () => {
           <h2>Metrics</h2>
           <div className="detail-row">
             <span>Total pledged</span>
-            <span>INR {totalPledged.toLocaleString("en-IN")}</span>
+            <span>{formatCurrency(totalPledged)}</span>
           </div>
           <div className="detail-row">
             <span>Average preference</span>
-            <span>{averageWeight.toFixed(1)}%</span>
+            <span>{formatPercent(averageWeight)}</span>
           </div>
           <div className="detail-row">
             <span>Highest preference</span>
-            <span>{highestWeight}%</span>
+            <span>{formatPercent(highestWeight)}</span>
           </div>
         </section>
         <section className="detail-card">
           <h2>Donor Alignment</h2>
-          <ul className="detail-list">
-            {donorCommitments.map((donor) => (
-              <li key={donor.id} className="detail-list-item">
-                <span>{donor.name}</span>
-                <span>{donor.type}</span>
-              </li>
-            ))}
-          </ul>
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Donor</th>
+                  <th>Type</th>
+                  <th>Admin %</th>
+                </tr>
+              </thead>
+              <tbody>
+                {donorCommitments.map((donor) => (
+                  <tr key={donor.id}>
+                    <td>{donor.name}</td>
+                    <td>{donor.type}</td>
+                    <td>{formatPercent(donor.adminOverheadPercent)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
         <section className="detail-card">
           <h2>Assigned employees</h2>
-          <ul className="detail-list">
-            {programEmployees.map((employee) => (
-              <li key={employee.id} className="detail-list-item">
-                <span>{employee.name}</span>
-                <span>
-                  {employee.city}, {employee.geography}
-                </span>
-              </li>
-            ))}
-          </ul>
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Role</th>
+                  <th>Location</th>
+                </tr>
+              </thead>
+              <tbody>
+                {programEmployees.map((employee) => (
+                  <tr key={employee.id}>
+                    <td>{employee.name}</td>
+                    <td>{employee.role}</td>
+                    <td>
+                      {employee.city}, {employee.geography}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       </div>
     </section>

@@ -1,4 +1,5 @@
 import type { Donor } from "../types";
+import { formatCurrency, formatPercent } from "../utils/format";
 
 type DonorCardProps = {
   donor: Donor;
@@ -31,11 +32,11 @@ const DonorCard = ({ donor, onDetails }: DonorCardProps) => {
           <p>{donor.type}</p>
         </div>
         <div className="donor-card-meta">
-          <span>Admin: {donor.adminOverheadPercent}%</span>
+          <span>Admin: {formatPercent(donor.adminOverheadPercent)}</span>
           <span>{donor.fcraApproved ? "FCRA: Yes" : "FCRA: No"}</span>
         </div>
         <div className="donor-card-value">
-          INR {donor.contributionAmount.toLocaleString("en-IN")}
+          {formatCurrency(donor.contributionAmount)}
         </div>
       </div>
       <div className="card-footer">

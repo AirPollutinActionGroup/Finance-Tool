@@ -1,5 +1,6 @@
 import { NavLink, useParams } from "react-router-dom";
 import { employees, programs } from "../data/mockData";
+import { formatCurrency, formatDate } from "../utils/format";
 
 const EmployeeDetailPage = () => {
   const { employeeId } = useParams();
@@ -52,27 +53,27 @@ const EmployeeDetailPage = () => {
           </div>
           <div className="detail-row">
             <span>Joined</span>
-            <span>{employee.joiningDate}</span>
+            <span>{formatDate(employee.joiningDate)}</span>
           </div>
         </section>
         <section className="detail-card">
           <h2>Metrics</h2>
           <div className="detail-row">
             <span>Monthly salary</span>
-            <span>INR {employee.monthlySalary.toLocaleString("en-IN")}</span>
+            <span>{formatCurrency(employee.monthlySalary)}</span>
           </div>
           <div className="detail-row">
             <span>PF contribution</span>
-            <span>INR {employee.pfContribution.toLocaleString("en-IN")}</span>
+            <span>{formatCurrency(employee.pfContribution)}</span>
           </div>
           <div className="detail-row">
             <span>TDS deduction</span>
-            <span>INR {employee.tdsDeduction.toLocaleString("en-IN")}</span>
+            <span>{formatCurrency(employee.tdsDeduction)}</span>
           </div>
           <div className="detail-row">
             <span>Annual salary</span>
             <span>
-              INR {(employee.monthlySalary * 12).toLocaleString("en-IN")}
+              {formatCurrency(employee.monthlySalary * 12)}
             </span>
           </div>
         </section>

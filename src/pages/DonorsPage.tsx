@@ -4,6 +4,7 @@ import DonorCard from "../components/DonorCard";
 import HorizontalCarousel from "../components/HorizontalCarousel";
 import Modal from "../components/Modal";
 import { donors, programs } from "../data/mockData";
+import { formatCurrency, formatPercent } from "../utils/format";
 
 const DonorsPage = () => {
   const [selectedDonorId, setSelectedDonorId] = useState<string | null>(null);
@@ -41,6 +42,45 @@ const DonorsPage = () => {
           </div>
         ))}
       </HorizontalCarousel>
+      <section className="detail-card">
+        <h2>Donor Directory</h2>
+        <div className="table-wrapper">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Donor</th>
+                <th>Type</th>
+                <th>Admin %</th>
+                <th>FCRA</th>
+                <th>Contribution</th>
+                <th>Preferences</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {donors.map((donor) => (
+                <tr key={donor.id}>
+                  <td>{donor.name}</td>
+                  <td>{donor.type}</td>
+                  <td>{formatPercent(donor.adminOverheadPercent)}</td>
+                  <td>{donor.fcraApproved ? "Yes" : "No"}</td>
+                  <td>{formatCurrency(donor.contributionAmount)}</td>
+                  <td>{donor.preferences.length}</td>
+                  <td>
+                    <button
+                      type="button"
+                      className="table-action"
+                      onClick={() => setSelectedDonorId(donor.id)}
+                    >
+                      Details
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
       <Modal
         isOpen={Boolean(selectedDonor)}
         title="Donor details"
@@ -58,34 +98,45 @@ const DonorsPage = () => {
             <div className="detail-grid">
               <section className="detail-card">
                 <h2>Overview</h2>
-                <div className="detail-row">
-                  <span>Contribution</span>
-                  <span>
-                    INR {selectedDonor.contributionAmount.toLocaleString("en-IN")}
-                  </span>
-                </div>
-                <div className="detail-row">
-                  <span>Admin overhead</span>
-                  <span>{selectedDonor.adminOverheadPercent}%</span>
-                </div>
-                <div className="detail-row">
-                  <span>FCRA</span>
-                  <span>{selectedDonor.fcraApproved ? "Approved" : "No"}</span>
+                <div className="table-wrapper">
+                  <table className="data-table">
+                    <tbody>
+                      <tr>
+                        <th>Contribution</th>
+                        <td>{formatCurrency(selectedDonor.contributionAmount)}</td>
+                      </tr>
+                      <tr>
+                        <th>Admin overhead</th>
+                        <td>{formatPercent(selectedDonor.adminOverheadPercent)}</td>
+                      </tr>
+                      <tr>
+                        <th>FCRA</th>
+                        <td>{selectedDonor.fcraApproved ? "Approved" : "No"}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </section>
               <section className="detail-card">
                 <h2>Preferences</h2>
-                <ul className="detail-list">
-                  {donorPreferences.map((preference) => (
-                    <li
-                      key={preference.programName}
-                      className="detail-list-item"
-                    >
-                      <span>{preference.programName}</span>
-                      <span>{preference.weight}%</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="table-wrapper">
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>Program</th>
+                        <th>Weight</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {donorPreferences.map((preference) => (
+                        <tr key={preference.programName}>
+                          <td>{preference.programName}</td>
+                          <td>{formatPercent(preference.weight)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </section>
             </div>
             <div className="modal-actions">

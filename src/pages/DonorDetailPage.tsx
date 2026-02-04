@@ -5,6 +5,7 @@ import {
   employees,
   programs,
 } from "../data/mockData";
+import { formatCurrency, formatDate, formatPercent } from "../utils/format";
 
 const DonorDetailPage = () => {
   const { donorId } = useParams();
@@ -78,11 +79,11 @@ const DonorDetailPage = () => {
           </div>
           <div className="detail-row">
             <span>Contribution</span>
-            <span>INR {donor.contributionAmount.toLocaleString("en-IN")}</span>
+            <span>{formatCurrency(donor.contributionAmount)}</span>
           </div>
           <div className="detail-row">
             <span>Admin overhead</span>
-            <span>{donor.adminOverheadPercent}%</span>
+            <span>{formatPercent(donor.adminOverheadPercent)}</span>
           </div>
           <div className="detail-row">
             <span>FCRA</span>
@@ -97,76 +98,117 @@ const DonorDetailPage = () => {
           <h2>Metrics</h2>
           <div className="detail-row">
             <span>Total preference weight</span>
-            <span>{totalWeight}%</span>
+            <span>{formatPercent(totalWeight)}</span>
           </div>
           <div className="detail-row">
             <span>Unallocated weight</span>
-            <span>{unallocatedWeight}%</span>
+            <span>{formatPercent(unallocatedWeight)}</span>
           </div>
           <div className="detail-row">
             <span>Top preference</span>
             <span>
-              {topPreference.programName} ({topPreference.weight}%)
+              {topPreference.programName} (
+              {formatPercent(topPreference.weight)})
             </span>
           </div>
         </section>
         <section className="detail-card">
           <h2>Allocation Preferences (Project)</h2>
-          <ul className="detail-list">
-            {preferencePrograms.map((preference) => (
-              <li key={preference.programName} className="detail-list-item">
-                <span>{preference.programName}</span>
-                <span>{preference.weight}%</span>
-              </li>
-            ))}
-          </ul>
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Program</th>
+                  <th>Weight</th>
+                </tr>
+              </thead>
+              <tbody>
+                {preferencePrograms.map((preference) => (
+                  <tr key={preference.programName}>
+                    <td>{preference.programName}</td>
+                    <td>{formatPercent(preference.weight)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
         <section className="detail-card">
           <h2>Geography Preferences</h2>
-          <ul className="detail-list">
-            {geographyPreferences.map((preference) => (
-              <li key={preference.geography} className="detail-list-item">
-                <span>{preference.geography}</span>
-                <span>{preference.cities.join(", ")}</span>
-              </li>
-            ))}
-          </ul>
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Geography</th>
+                  <th>Cities</th>
+                </tr>
+              </thead>
+              <tbody>
+                {geographyPreferences.map((preference) => (
+                  <tr key={preference.geography}>
+                    <td>{preference.geography}</td>
+                    <td>{preference.cities.join(", ")}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
         <section className="detail-card">
           <h2>Allocated Employees</h2>
-          <ul className="detail-list">
-            {allocatedEmployees.map((employee) => {
-              const programName =
-                programs.find((program) => program.id === employee.programId)
-                  ?.name ?? "Program";
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Role</th>
+                  <th>Program</th>
+                </tr>
+              </thead>
+              <tbody>
+                {allocatedEmployees.map((employee) => {
+                  const programName =
+                    programs.find((program) => program.id === employee.programId)
+                      ?.name ?? "Program";
 
-              return (
-                <li key={employee.id} className="detail-list-item">
-                  <span>{employee.name}</span>
-                  <span>
-                    {employee.role} · {programName}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
+                  return (
+                    <tr key={employee.id}>
+                      <td>{employee.name}</td>
+                      <td>{employee.role}</td>
+                      <td>{programName}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </section>
         <section className="detail-card">
           <h2>Recent Moves</h2>
-          <ul className="detail-list">
-            {recentMoves.length ? (
-              recentMoves.map((event) => (
-                <li key={event.id} className="detail-list-item">
-                  <span>{event.summary}</span>
-                  <span>{event.date}</span>
-                </li>
-              ))
-            ) : (
-              <li className="detail-list-item">
-                <span>No recent moves recorded.</span>
-              </li>
-            )}
-          </ul>
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Update</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentMoves.length ? (
+                  recentMoves.map((event) => (
+                    <tr key={event.id}>
+                      <td>{event.summary}</td>
+                      <td>{formatDate(event.date)}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={2}>No recent moves recorded.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </section>
       </div>
     </section>

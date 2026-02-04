@@ -4,6 +4,7 @@ import {
   OPERATIONAL_OVERHEAD,
   runSimulation,
 } from "../simulation/engine";
+import { formatCurrency } from "../utils/format";
 
 const scenarios = [
   {
@@ -153,23 +154,23 @@ const SimulationPage = () => {
       <div className="metric-grid">
         <div className="metric-card">
           <h3>Total contributions</h3>
-          <p>INR {simulation.totalContributions.toLocaleString("en-IN")}</p>
+          <p>{formatCurrency(simulation.totalContributions)}</p>
         </div>
         <div className="metric-card">
           <h3>Admin cost</h3>
-          <p>INR {simulation.totalAdminCost.toLocaleString("en-IN")}</p>
+          <p>{formatCurrency(simulation.totalAdminCost)}</p>
         </div>
         <div className="metric-card">
           <h3>Net funding</h3>
-          <p>INR {simulation.totalNetFunding.toLocaleString("en-IN")}</p>
+          <p>{formatCurrency(simulation.totalNetFunding)}</p>
         </div>
         <div className="metric-card">
           <h3>General fund</h3>
-          <p>INR {simulation.generalFundTotal.toLocaleString("en-IN")}</p>
+          <p>{formatCurrency(simulation.generalFundTotal)}</p>
         </div>
         <div className="metric-card">
           <h3>Monthly burn</h3>
-          <p>INR {simulation.monthlyBurn.toLocaleString("en-IN")}</p>
+          <p>{formatCurrency(simulation.monthlyBurn)}</p>
         </div>
         <div className="metric-card">
           <h3>Runway</h3>
@@ -192,39 +193,51 @@ const SimulationPage = () => {
       <div className="table-grid">
         <section className="detail-card">
           <h2>Donor breakdown</h2>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Donor</th>
-                <th>Type</th>
-                <th>Net</th>
-                <th>Admin</th>
-                <th>General fund</th>
-              </tr>
-            </thead>
-            <tbody>
-              {simulation.donorSummaries.map((donor) => (
-                <tr key={donor.donorId}>
-                  <td>{donor.donorName}</td>
-                  <td>{donor.donorType}</td>
-                  <td>INR {donor.netAmount.toLocaleString("en-IN")}</td>
-                  <td>INR {donor.adminAmount.toLocaleString("en-IN")}</td>
-                  <td>INR {donor.generalFundAmount.toLocaleString("en-IN")}</td>
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Donor</th>
+                  <th>Type</th>
+                  <th>Net</th>
+                  <th>Admin</th>
+                  <th>General fund</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {simulation.donorSummaries.map((donor) => (
+                  <tr key={donor.donorId}>
+                    <td>{donor.donorName}</td>
+                    <td>{donor.donorType}</td>
+                    <td>{formatCurrency(donor.netAmount)}</td>
+                    <td>{formatCurrency(donor.adminAmount)}</td>
+                    <td>{formatCurrency(donor.generalFundAmount)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
         <section className="detail-card">
           <h2>Geography allocation</h2>
-          <ul className="detail-list">
-            {simulation.geographyAllocations.map((geo) => (
-              <li key={geo.geography} className="detail-list-item">
-                <span>{geo.geography}</span>
-                <span>INR {geo.amount.toLocaleString("en-IN")}</span>
-              </li>
-            ))}
-          </ul>
+          <div className="table-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Geography</th>
+                  <th>Allocation</th>
+                </tr>
+              </thead>
+              <tbody>
+                {simulation.geographyAllocations.map((geo) => (
+                  <tr key={geo.geography}>
+                    <td>{geo.geography}</td>
+                    <td>{formatCurrency(geo.amount)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       </div>
     </section>

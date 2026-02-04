@@ -437,6 +437,36 @@ a {
   color: var(--ink-soft);
 }
 
+.data-table tbody th {
+  text-transform: none;
+  font-size: 0.85rem;
+  letter-spacing: 0.01em;
+  font-weight: 500;
+}
+
+.data-table tbody tr:hover {
+  background: rgba(45, 68, 68, 0.35);
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table-action {
+  border: none;
+  background: var(--brand);
+  color: #1f2e2e;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.table-action:hover {
+  background: var(--brand-hover);
+}
+
 .simulation-controls {
   display: grid;
   gap: 16px;

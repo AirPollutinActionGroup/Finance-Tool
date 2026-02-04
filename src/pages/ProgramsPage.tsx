@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { donors, employees, programs } from "../data/mockData";
+import { formatPercent } from "../utils/format";
 
 const ProgramsPage = () => {
   const [activeTab, setActiveTab] = useState<"programs" | "geographies">(
@@ -118,19 +119,49 @@ const ProgramsPage = () => {
               <div className="insight-columns">
                 <div>
                   <h3>Employees</h3>
-                  <ul>
-                    {programEmployees.map((employee) => (
-                      <li key={employee.id}>{employee.name}</li>
-                    ))}
-                  </ul>
+                  <div className="table-wrapper">
+                    <table className="data-table">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Role</th>
+                          <th>City</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {programEmployees.map((employee) => (
+                          <tr key={employee.id}>
+                            <td>{employee.name}</td>
+                            <td>{employee.role}</td>
+                            <td>{employee.city}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
                 <div>
                   <h3>Donors</h3>
-                  <ul>
-                    {programDonors.map((donor) => (
-                      <li key={donor.id}>{donor.name}</li>
-                    ))}
-                  </ul>
+                  <div className="table-wrapper">
+                    <table className="data-table">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Type</th>
+                          <th>Admin %</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {programDonors.map((donor) => (
+                          <tr key={donor.id}>
+                            <td>{donor.name}</td>
+                            <td>{donor.type}</td>
+                            <td>{formatPercent(donor.adminOverheadPercent)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </article>
@@ -147,21 +178,49 @@ const ProgramsPage = () => {
               <div className="insight-columns">
                 <div>
                   <h3>Employees</h3>
-                  <ul>
-                    {geography.employees.map((employee) => (
-                      <li key={employee.id}>
-                        {employee.name} · {employee.city}
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="table-wrapper">
+                    <table className="data-table">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Role</th>
+                          <th>City</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {geography.employees.map((employee) => (
+                          <tr key={employee.id}>
+                            <td>{employee.name}</td>
+                            <td>{employee.role}</td>
+                            <td>{employee.city}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
                 <div>
                   <h3>Donors</h3>
-                  <ul>
-                    {geography.donors.map((donor) => (
-                      <li key={donor.id}>{donor.name}</li>
-                    ))}
-                  </ul>
+                  <div className="table-wrapper">
+                    <table className="data-table">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Type</th>
+                          <th>Admin %</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {geography.donors.map((donor) => (
+                          <tr key={donor.id}>
+                            <td>{donor.name}</td>
+                            <td>{donor.type}</td>
+                            <td>{formatPercent(donor.adminOverheadPercent)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </article>

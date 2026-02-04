@@ -4,6 +4,7 @@ import EmployeeCard from "../components/EmployeeCard";
 import HorizontalCarousel from "../components/HorizontalCarousel";
 import Modal from "../components/Modal";
 import { employees, programs } from "../data/mockData";
+import { formatCurrency, formatDate } from "../utils/format";
 
 const EmployeesPage = () => {
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(
@@ -41,6 +42,53 @@ const EmployeesPage = () => {
           </div>
         ))}
       </HorizontalCarousel>
+      <section className="detail-card">
+        <h2>Employee Directory</h2>
+        <div className="table-wrapper">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Employee</th>
+                <th>Role</th>
+                <th>Program</th>
+                <th>Location</th>
+                <th>Joining</th>
+                <th>Monthly Salary</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {employees.map((employee) => {
+                const programName =
+                  programs.find((program) => program.id === employee.programId)
+                    ?.name ?? "Unassigned";
+
+                return (
+                  <tr key={employee.id}>
+                    <td>{employee.name}</td>
+                    <td>{employee.role}</td>
+                    <td>{programName}</td>
+                    <td>
+                      {employee.city}, {employee.geography}
+                    </td>
+                    <td>{formatDate(employee.joiningDate)}</td>
+                    <td>{formatCurrency(employee.monthlySalary)}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="table-action"
+                        onClick={() => setSelectedEmployeeId(employee.id)}
+                      >
+                        Details
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
       <Modal
         isOpen={Boolean(selectedEmployee)}
         title="Employee details"
@@ -59,40 +107,46 @@ const EmployeesPage = () => {
             <div className="detail-grid">
               <section className="detail-card">
                 <h2>Profile</h2>
-                <div className="detail-row">
-                  <span>Location</span>
-                  <span>
-                    {selectedEmployee.city}, {selectedEmployee.geography}
-                  </span>
-                </div>
-                <div className="detail-row">
-                  <span>Program</span>
-                  <span>{selectedProgram}</span>
-                </div>
-                <div className="detail-row">
-                  <span>Joined</span>
-                  <span>{selectedEmployee.joiningDate}</span>
+                <div className="table-wrapper">
+                  <table className="data-table">
+                    <tbody>
+                      <tr>
+                        <th>Location</th>
+                        <td>
+                          {selectedEmployee.city}, {selectedEmployee.geography}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>Program</th>
+                        <td>{selectedProgram}</td>
+                      </tr>
+                      <tr>
+                        <th>Joined</th>
+                        <td>{formatDate(selectedEmployee.joiningDate)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </section>
               <section className="detail-card">
                 <h2>Compensation</h2>
-                <div className="detail-row">
-                  <span>Monthly salary</span>
-                  <span>
-                    INR {selectedEmployee.monthlySalary.toLocaleString("en-IN")}
-                  </span>
-                </div>
-                <div className="detail-row">
-                  <span>PF contribution</span>
-                  <span>
-                    INR {selectedEmployee.pfContribution.toLocaleString("en-IN")}
-                  </span>
-                </div>
-                <div className="detail-row">
-                  <span>TDS deduction</span>
-                  <span>
-                    INR {selectedEmployee.tdsDeduction.toLocaleString("en-IN")}
-                  </span>
+                <div className="table-wrapper">
+                  <table className="data-table">
+                    <tbody>
+                      <tr>
+                        <th>Monthly salary</th>
+                        <td>{formatCurrency(selectedEmployee.monthlySalary)}</td>
+                      </tr>
+                      <tr>
+                        <th>PF contribution</th>
+                        <td>{formatCurrency(selectedEmployee.pfContribution)}</td>
+                      </tr>
+                      <tr>
+                        <th>TDS deduction</th>
+                        <td>{formatCurrency(selectedEmployee.tdsDeduction)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </section>
             </div>

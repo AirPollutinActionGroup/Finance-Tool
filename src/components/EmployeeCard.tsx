@@ -1,4 +1,5 @@
 import type { Employee } from "../types";
+import { formatCurrency } from "../utils/format";
 
 type EmployeeCardProps = {
   employee: Employee;
@@ -38,7 +39,7 @@ const EmployeeCard = ({ employee, onDetails }: EmployeeCardProps) => {
             {employee.city}, {employee.geography}
           </span>
           <span>
-            INR {employee.monthlySalary.toLocaleString("en-IN")}/mo
+            {formatCurrency(employee.monthlySalary)}/mo
           </span>
         </div>
       </div>
