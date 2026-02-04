@@ -1,5 +1,16 @@
 import type { Donor, Employee, Program } from "../types";
 
+const portraitUrls = [
+  "https://commons.wikimedia.org/wiki/Special:FilePath/Abraham_Lincoln_November_1863.jpg",
+  "https://commons.wikimedia.org/wiki/Special:FilePath/Marie_Curie_c1920.jpg",
+  "https://commons.wikimedia.org/wiki/Special:FilePath/Charles_Darwin_seated.jpg",
+  "https://commons.wikimedia.org/wiki/Special:FilePath/Florence_Nightingale.jpg",
+  "https://commons.wikimedia.org/wiki/Special:FilePath/Mark_Twain_by_AF_Bradley.jpg",
+  "https://commons.wikimedia.org/wiki/Special:FilePath/Thomas_Edison2.jpg",
+  "https://commons.wikimedia.org/wiki/Special:FilePath/Ada_Lovelace_portrait.jpg",
+  "https://commons.wikimedia.org/wiki/Special:FilePath/Louis_Pasteur.jpg",
+];
+
 export const programs: Program[] = [
   {
     id: "dsp",
@@ -79,7 +90,7 @@ export const employees: Employee[] = [
     role: "Program Manager",
     monthlyCost: 85000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+01",
+    photoUrl: portraitUrls[0],
   },
   {
     id: "emp-002",
@@ -87,7 +98,7 @@ export const employees: Employee[] = [
     role: "Field Officer",
     monthlyCost: 45000,
     geography: "UP - Prayagraj",
-    photoUrl: "https://placehold.co/200x200?text=Emp+02",
+    photoUrl: portraitUrls[1],
   },
   {
     id: "emp-003",
@@ -95,7 +106,7 @@ export const employees: Employee[] = [
     role: "Data Analyst",
     monthlyCost: 60000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+03",
+    photoUrl: portraitUrls[2],
   },
   {
     id: "emp-004",
@@ -103,7 +114,7 @@ export const employees: Employee[] = [
     role: "Community Liaison",
     monthlyCost: 42000,
     geography: "UP - Banaras",
-    photoUrl: "https://placehold.co/200x200?text=Emp+04",
+    photoUrl: portraitUrls[3],
   },
   {
     id: "emp-005",
@@ -111,7 +122,7 @@ export const employees: Employee[] = [
     role: "Finance Associate",
     monthlyCost: 55000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+05",
+    photoUrl: portraitUrls[4],
   },
   {
     id: "emp-006",
@@ -119,7 +130,7 @@ export const employees: Employee[] = [
     role: "Operations Lead",
     monthlyCost: 78000,
     geography: "UP - Lucknow",
-    photoUrl: "https://placehold.co/200x200?text=Emp+06",
+    photoUrl: portraitUrls[5],
   },
   {
     id: "emp-007",
@@ -127,7 +138,7 @@ export const employees: Employee[] = [
     role: "Training Coordinator",
     monthlyCost: 48000,
     geography: "Bihar - Gaya",
-    photoUrl: "https://placehold.co/200x200?text=Emp+07",
+    photoUrl: portraitUrls[6],
   },
   {
     id: "emp-008",
@@ -135,7 +146,7 @@ export const employees: Employee[] = [
     role: "Monitoring Specialist",
     monthlyCost: 52000,
     geography: "UP - Prayagraj",
-    photoUrl: "https://placehold.co/200x200?text=Emp+08",
+    photoUrl: portraitUrls[7],
   },
   {
     id: "emp-009",
@@ -143,7 +154,7 @@ export const employees: Employee[] = [
     role: "Partnerships Lead",
     monthlyCost: 70000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+09",
+    photoUrl: portraitUrls[0],
   },
   {
     id: "emp-010",
@@ -151,7 +162,7 @@ export const employees: Employee[] = [
     role: "Research Associate",
     monthlyCost: 50000,
     geography: "Bihar - Muzaffarpur",
-    photoUrl: "https://placehold.co/200x200?text=Emp+10",
+    photoUrl: portraitUrls[1],
   },
   {
     id: "emp-011",
@@ -159,7 +170,7 @@ export const employees: Employee[] = [
     role: "Field Officer",
     monthlyCost: 43000,
     geography: "UP - Banaras",
-    photoUrl: "https://placehold.co/200x200?text=Emp+11",
+    photoUrl: portraitUrls[2],
   },
   {
     id: "emp-012",
@@ -167,7 +178,7 @@ export const employees: Employee[] = [
     role: "HR Associate",
     monthlyCost: 47000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+12",
+    photoUrl: portraitUrls[3],
   },
   {
     id: "emp-013",
@@ -175,7 +186,7 @@ export const employees: Employee[] = [
     role: "Program Manager",
     monthlyCost: 82000,
     geography: "UP - Lucknow",
-    photoUrl: "https://placehold.co/200x200?text=Emp+13",
+    photoUrl: portraitUrls[4],
   },
   {
     id: "emp-014",
@@ -183,7 +194,7 @@ export const employees: Employee[] = [
     role: "Data Analyst",
     monthlyCost: 59000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+14",
+    photoUrl: portraitUrls[5],
   },
   {
     id: "emp-015",
@@ -191,7 +202,7 @@ export const employees: Employee[] = [
     role: "Community Liaison",
     monthlyCost: 41000,
     geography: "Bihar - Gaya",
-    photoUrl: "https://placehold.co/200x200?text=Emp+15",
+    photoUrl: portraitUrls[6],
   },
   {
     id: "emp-016",
@@ -199,7 +210,7 @@ export const employees: Employee[] = [
     role: "Outreach Coordinator",
     monthlyCost: 46000,
     geography: "UP - Prayagraj",
-    photoUrl: "https://placehold.co/200x200?text=Emp+16",
+    photoUrl: portraitUrls[7],
   },
   {
     id: "emp-017",
@@ -207,7 +218,7 @@ export const employees: Employee[] = [
     role: "Finance Associate",
     monthlyCost: 54000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+17",
+    photoUrl: portraitUrls[0],
   },
   {
     id: "emp-018",
@@ -215,7 +226,7 @@ export const employees: Employee[] = [
     role: "Monitoring Specialist",
     monthlyCost: 51000,
     geography: "UP - Banaras",
-    photoUrl: "https://placehold.co/200x200?text=Emp+18",
+    photoUrl: portraitUrls[1],
   },
   {
     id: "emp-019",
@@ -223,7 +234,7 @@ export const employees: Employee[] = [
     role: "Operations Lead",
     monthlyCost: 76000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+19",
+    photoUrl: portraitUrls[2],
   },
   {
     id: "emp-020",
@@ -231,7 +242,7 @@ export const employees: Employee[] = [
     role: "Training Coordinator",
     monthlyCost: 47000,
     geography: "Bihar - Muzaffarpur",
-    photoUrl: "https://placehold.co/200x200?text=Emp+20",
+    photoUrl: portraitUrls[3],
   },
   {
     id: "emp-021",
@@ -239,7 +250,7 @@ export const employees: Employee[] = [
     role: "Partnerships Lead",
     monthlyCost: 69000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+21",
+    photoUrl: portraitUrls[4],
   },
   {
     id: "emp-022",
@@ -247,7 +258,7 @@ export const employees: Employee[] = [
     role: "Field Officer",
     monthlyCost: 44000,
     geography: "UP - Lucknow",
-    photoUrl: "https://placehold.co/200x200?text=Emp+22",
+    photoUrl: portraitUrls[5],
   },
   {
     id: "emp-023",
@@ -255,7 +266,7 @@ export const employees: Employee[] = [
     role: "Research Associate",
     monthlyCost: 52000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+23",
+    photoUrl: portraitUrls[6],
   },
   {
     id: "emp-024",
@@ -263,7 +274,7 @@ export const employees: Employee[] = [
     role: "Community Liaison",
     monthlyCost: 40000,
     geography: "UP - Prayagraj",
-    photoUrl: "https://placehold.co/200x200?text=Emp+24",
+    photoUrl: portraitUrls[7],
   },
   {
     id: "emp-025",
@@ -271,7 +282,7 @@ export const employees: Employee[] = [
     role: "Data Analyst",
     monthlyCost: 61000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+25",
+    photoUrl: portraitUrls[0],
   },
   {
     id: "emp-026",
@@ -279,7 +290,7 @@ export const employees: Employee[] = [
     role: "Program Manager",
     monthlyCost: 83000,
     geography: "UP - Banaras",
-    photoUrl: "https://placehold.co/200x200?text=Emp+26",
+    photoUrl: portraitUrls[1],
   },
   {
     id: "emp-027",
@@ -287,7 +298,7 @@ export const employees: Employee[] = [
     role: "HR Associate",
     monthlyCost: 48000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+27",
+    photoUrl: portraitUrls[2],
   },
   {
     id: "emp-028",
@@ -295,7 +306,7 @@ export const employees: Employee[] = [
     role: "Outreach Coordinator",
     monthlyCost: 45000,
     geography: "Bihar - Gaya",
-    photoUrl: "https://placehold.co/200x200?text=Emp+28",
+    photoUrl: portraitUrls[3],
   },
   {
     id: "emp-029",
@@ -303,7 +314,7 @@ export const employees: Employee[] = [
     role: "Finance Associate",
     monthlyCost: 56000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+29",
+    photoUrl: portraitUrls[4],
   },
   {
     id: "emp-030",
@@ -311,7 +322,7 @@ export const employees: Employee[] = [
     role: "Monitoring Specialist",
     monthlyCost: 52000,
     geography: "UP - Lucknow",
-    photoUrl: "https://placehold.co/200x200?text=Emp+30",
+    photoUrl: portraitUrls[5],
   },
   {
     id: "emp-031",
@@ -319,7 +330,7 @@ export const employees: Employee[] = [
     role: "Field Officer",
     monthlyCost: 43000,
     geography: "Bihar - Muzaffarpur",
-    photoUrl: "https://placehold.co/200x200?text=Emp+31",
+    photoUrl: portraitUrls[6],
   },
   {
     id: "emp-032",
@@ -327,7 +338,7 @@ export const employees: Employee[] = [
     role: "Operations Lead",
     monthlyCost: 77000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+32",
+    photoUrl: portraitUrls[7],
   },
   {
     id: "emp-033",
@@ -335,7 +346,7 @@ export const employees: Employee[] = [
     role: "Training Coordinator",
     monthlyCost: 49000,
     geography: "UP - Banaras",
-    photoUrl: "https://placehold.co/200x200?text=Emp+33",
+    photoUrl: portraitUrls[0],
   },
   {
     id: "emp-034",
@@ -343,7 +354,7 @@ export const employees: Employee[] = [
     role: "Research Associate",
     monthlyCost: 51000,
     geography: "UP - Prayagraj",
-    photoUrl: "https://placehold.co/200x200?text=Emp+34",
+    photoUrl: portraitUrls[1],
   },
   {
     id: "emp-035",
@@ -351,7 +362,7 @@ export const employees: Employee[] = [
     role: "Community Liaison",
     monthlyCost: 42000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+35",
+    photoUrl: portraitUrls[2],
   },
   {
     id: "emp-036",
@@ -359,7 +370,7 @@ export const employees: Employee[] = [
     role: "Data Analyst",
     monthlyCost: 60000,
     geography: "Bihar - Gaya",
-    photoUrl: "https://placehold.co/200x200?text=Emp+36",
+    photoUrl: portraitUrls[3],
   },
   {
     id: "emp-037",
@@ -367,7 +378,7 @@ export const employees: Employee[] = [
     role: "Partnerships Lead",
     monthlyCost: 71000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+37",
+    photoUrl: portraitUrls[4],
   },
   {
     id: "emp-038",
@@ -375,7 +386,7 @@ export const employees: Employee[] = [
     role: "Finance Associate",
     monthlyCost: 55000,
     geography: "UP - Lucknow",
-    photoUrl: "https://placehold.co/200x200?text=Emp+38",
+    photoUrl: portraitUrls[5],
   },
   {
     id: "emp-039",
@@ -383,7 +394,7 @@ export const employees: Employee[] = [
     role: "Field Officer",
     monthlyCost: 44000,
     geography: "UP - Prayagraj",
-    photoUrl: "https://placehold.co/200x200?text=Emp+39",
+    photoUrl: portraitUrls[6],
   },
   {
     id: "emp-040",
@@ -391,7 +402,7 @@ export const employees: Employee[] = [
     role: "HR Associate",
     monthlyCost: 47000,
     geography: "Bihar - Muzaffarpur",
-    photoUrl: "https://placehold.co/200x200?text=Emp+40",
+    photoUrl: portraitUrls[7],
   },
   {
     id: "emp-041",
@@ -399,7 +410,7 @@ export const employees: Employee[] = [
     role: "Program Manager",
     monthlyCost: 84000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+41",
+    photoUrl: portraitUrls[0],
   },
   {
     id: "emp-042",
@@ -407,7 +418,7 @@ export const employees: Employee[] = [
     role: "Outreach Coordinator",
     monthlyCost: 46000,
     geography: "UP - Banaras",
-    photoUrl: "https://placehold.co/200x200?text=Emp+42",
+    photoUrl: portraitUrls[1],
   },
   {
     id: "emp-043",
@@ -415,7 +426,7 @@ export const employees: Employee[] = [
     role: "Monitoring Specialist",
     monthlyCost: 53000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+43",
+    photoUrl: portraitUrls[2],
   },
   {
     id: "emp-044",
@@ -423,7 +434,7 @@ export const employees: Employee[] = [
     role: "Community Liaison",
     monthlyCost: 41000,
     geography: "UP - Lucknow",
-    photoUrl: "https://placehold.co/200x200?text=Emp+44",
+    photoUrl: portraitUrls[3],
   },
   {
     id: "emp-045",
@@ -431,7 +442,7 @@ export const employees: Employee[] = [
     role: "Data Analyst",
     monthlyCost: 62000,
     geography: "Bihar - Gaya",
-    photoUrl: "https://placehold.co/200x200?text=Emp+45",
+    photoUrl: portraitUrls[4],
   },
   {
     id: "emp-046",
@@ -439,7 +450,7 @@ export const employees: Employee[] = [
     role: "Training Coordinator",
     monthlyCost: 49500,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+46",
+    photoUrl: portraitUrls[5],
   },
   {
     id: "emp-047",
@@ -447,7 +458,7 @@ export const employees: Employee[] = [
     role: "Field Officer",
     monthlyCost: 43500,
     geography: "UP - Prayagraj",
-    photoUrl: "https://placehold.co/200x200?text=Emp+47",
+    photoUrl: portraitUrls[6],
   },
   {
     id: "emp-048",
@@ -455,7 +466,7 @@ export const employees: Employee[] = [
     role: "Partnerships Lead",
     monthlyCost: 68000,
     geography: "Delhi NCR",
-    photoUrl: "https://placehold.co/200x200?text=Emp+48",
+    photoUrl: portraitUrls[7],
   },
   {
     id: "emp-049",
@@ -463,7 +474,7 @@ export const employees: Employee[] = [
     role: "Finance Associate",
     monthlyCost: 57000,
     geography: "UP - Banaras",
-    photoUrl: "https://placehold.co/200x200?text=Emp+49",
+    photoUrl: portraitUrls[0],
   },
   {
     id: "emp-050",
@@ -471,6 +482,6 @@ export const employees: Employee[] = [
     role: "Research Associate",
     monthlyCost: 50500,
     geography: "Bihar - Muzaffarpur",
-    photoUrl: "https://placehold.co/200x200?text=Emp+50",
+    photoUrl: portraitUrls[1],
   },
 ];
