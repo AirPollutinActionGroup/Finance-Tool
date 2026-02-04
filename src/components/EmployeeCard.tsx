@@ -16,9 +16,11 @@ const EmployeeCard = ({ employee }: EmployeeCardProps) => {
           <p>{employee.role}</p>
         </div>
         <div className="employee-card-meta">
-          <span>{employee.geography}</span>
           <span>
-            INR {employee.monthlyCost.toLocaleString("en-IN")}/mo
+            {employee.city}, {employee.geography}
+          </span>
+          <span>
+            INR {employee.monthlySalary.toLocaleString("en-IN")}/mo
           </span>
         </div>
       </div>

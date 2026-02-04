@@ -1,5 +1,5 @@
 import { NavLink, useParams } from "react-router-dom";
-import { employees } from "../data/mockData";
+import { employees, programs } from "../data/mockData";
 
 const EmployeeDetailPage = () => {
   const { employeeId } = useParams();
@@ -16,6 +16,10 @@ const EmployeeDetailPage = () => {
       </section>
     );
   }
+
+  const program =
+    programs.find((item) => item.id === employee.programId)?.name ??
+    "Unassigned";
 
   return (
     <section className="page-section">
@@ -37,20 +41,38 @@ const EmployeeDetailPage = () => {
             <span>{employee.role}</span>
           </div>
           <div className="detail-row">
-            <span>Region</span>
-            <span>{employee.geography}</span>
+            <span>Location</span>
+            <span>
+              {employee.city}, {employee.geography}
+            </span>
+          </div>
+          <div className="detail-row">
+            <span>Program</span>
+            <span>{program}</span>
+          </div>
+          <div className="detail-row">
+            <span>Joined</span>
+            <span>{employee.joiningDate}</span>
           </div>
         </section>
         <section className="detail-card">
           <h2>Metrics</h2>
           <div className="detail-row">
-            <span>Monthly cost</span>
-            <span>INR {employee.monthlyCost.toLocaleString("en-IN")}</span>
+            <span>Monthly salary</span>
+            <span>INR {employee.monthlySalary.toLocaleString("en-IN")}</span>
           </div>
           <div className="detail-row">
-            <span>Annual cost</span>
+            <span>PF contribution</span>
+            <span>INR {employee.pfContribution.toLocaleString("en-IN")}</span>
+          </div>
+          <div className="detail-row">
+            <span>TDS deduction</span>
+            <span>INR {employee.tdsDeduction.toLocaleString("en-IN")}</span>
+          </div>
+          <div className="detail-row">
+            <span>Annual salary</span>
             <span>
-              INR {(employee.monthlyCost * 12).toLocaleString("en-IN")}
+              INR {(employee.monthlySalary * 12).toLocaleString("en-IN")}
             </span>
           </div>
         </section>

@@ -1,4 +1,10 @@
-import type { Donor, Employee, Program } from "../types";
+import type {
+  City,
+  Donor,
+  Employee,
+  GeographyState,
+  Program,
+} from "../types";
 
 const portraitUrls = [
   "https://commons.wikimedia.org/wiki/Special:FilePath/Abraham_Lincoln_November_1863.jpg",
@@ -11,24 +17,41 @@ const portraitUrls = [
   "https://commons.wikimedia.org/wiki/Special:FilePath/Louis_Pasteur.jpg",
 ];
 
+const geographyLookup: Record<
+  string,
+  { state: GeographyState; city: City }
+> = {
+  "Delhi NCR": { state: "Delhi NCR", city: "Delhi" },
+  "UP - Prayagraj": { state: "Uttar Pradesh", city: "Prayagraj" },
+  "UP - Banaras": { state: "Uttar Pradesh", city: "Banaras" },
+  "UP - Lucknow": { state: "Uttar Pradesh", city: "Lucknow" },
+  "Bihar - Gaya": { state: "Bihar", city: "Gaya" },
+  "Bihar - Muzaffarpur": { state: "Bihar", city: "Muzaffarpur" },
+};
+
+const defaultGeography = { state: "Delhi NCR", city: "Delhi" } as const;
+
 export const programs: Program[] = [
   {
     id: "dsp",
     name: "DSP",
     description: "Digital Skills Program focused on employability.",
     geography: "Delhi NCR",
+    cities: ["Delhi"],
   },
   {
     id: "mrs",
     name: "MRS",
     description: "Maternal and Reproductive Support services.",
-    geography: "UP - Lucknow",
+    geography: "Uttar Pradesh",
+    cities: ["Lucknow", "Prayagraj"],
   },
   {
     id: "cd",
     name: "C&D",
     description: "Community Development initiatives and outreach.",
-    geography: "Bihar - Gaya",
+    geography: "Bihar",
+    cities: ["Gaya", "Muzaffarpur"],
   },
 ];
 
@@ -38,6 +61,8 @@ export const donors: Donor[] = [
     name: "Aurora Global Trust",
     type: "International",
     contributionAmount: 2500000,
+    adminOverheadPercent: 18,
+    fcraApproved: true,
     preferences: [
       { programId: "dsp", weight: 50 },
       { programId: "mrs", weight: 30 },
@@ -47,8 +72,10 @@ export const donors: Donor[] = [
   {
     id: "donor-saras",
     name: "Saras Foundation",
-    type: "India",
+    type: "National",
     contributionAmount: 1200000,
+    adminOverheadPercent: 12,
+    fcraApproved: false,
     preferences: [
       { programId: "dsp", weight: 60 },
       { programId: "mrs", weight: 20 },
@@ -59,6 +86,8 @@ export const donors: Donor[] = [
     name: "Pragati CSR Fund",
     type: "CSR",
     contributionAmount: 1800000,
+    adminOverheadPercent: 15,
+    fcraApproved: false,
     preferences: [
       { programId: "mrs", weight: 50 },
       { programId: "cd", weight: 35 },
@@ -69,6 +98,8 @@ export const donors: Donor[] = [
     name: "Mehra Family Office",
     type: "HNI",
     contributionAmount: 800000,
+    adminOverheadPercent: 10,
+    fcraApproved: false,
     preferences: [{ programId: "dsp", weight: 70 }],
   },
   {
@@ -76,6 +107,8 @@ export const donors: Donor[] = [
     name: "Northstar Impact",
     type: "International",
     contributionAmount: 1500000,
+    adminOverheadPercent: 18,
+    fcraApproved: true,
     preferences: [
       { programId: "cd", weight: 40 },
       { programId: "mrs", weight: 40 },
@@ -83,7 +116,16 @@ export const donors: Donor[] = [
   },
 ];
 
-export const employees: Employee[] = [
+type RawEmployee = {
+  id: string;
+  name: string;
+  role: string;
+  monthlyCost: number;
+  geography: string;
+  photoUrl: string;
+};
+
+const rawEmployees: RawEmployee[] = [
   {
     id: "emp-001",
     name: "Aarav Singh",
@@ -485,3 +527,35 @@ export const employees: Employee[] = [
     photoUrl: portraitUrls[1],
   },
 ];
+
+const buildJoiningDate = (index: number) => {
+  const baseDate = new Date(Date.UTC(2019, 0, 15));
+  const nextDate = new Date(baseDate);
+  nextDate.setMonth(baseDate.getMonth() + index);
+
+  return nextDate.toISOString().slice(0, 10);
+};
+
+const programRotation = programs.map((program) => program.id);
+
+export const employees: Employee[] = rawEmployees.map((employee, index) => {
+  const geography =
+    geographyLookup[employee.geography] ?? defaultGeography;
+  const monthlySalary = employee.monthlyCost;
+  const pfContribution = Math.round(monthlySalary * 0.12);
+  const tdsDeduction = Math.round(monthlySalary * 0.1);
+
+  return {
+    id: employee.id,
+    name: employee.name,
+    role: employee.role,
+    joiningDate: buildJoiningDate(index),
+    monthlySalary,
+    pfContribution,
+    tdsDeduction,
+    geography: geography.state,
+    city: geography.city,
+    programId: programRotation[index % programRotation.length],
+    photoUrl: employee.photoUrl,
+  };
+});

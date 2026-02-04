@@ -1,3 +1,6 @@
+import { NavLink } from "react-router-dom";
+import DonorCard from "../components/DonorCard";
+import HorizontalCarousel from "../components/HorizontalCarousel";
 import { donors } from "../data/mockData";
 
 const DonorsPage = () => {
@@ -12,24 +15,13 @@ const DonorsPage = () => {
           <span>{donors.length} donors</span>
         </div>
       </header>
-      <div className="list-layout">
-        <ul className="donor-list">
-          {donors.map((donor) => (
-            <li key={donor.id} className="donor-list-item">
-              <div className="donor-list-primary">
-                <h2>{donor.name}</h2>
-                <p>{donor.type}</p>
-              </div>
-              <div className="donor-list-secondary">
-                <span>
-                  INR {donor.contributionAmount.toLocaleString("en-IN")}
-                </span>
-                <span>{donor.preferences.length} allocations</span>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <HorizontalCarousel ariaLabel="Donor cards">
+        {donors.map((donor) => (
+          <NavLink key={donor.id} to={`/donors/${donor.id}`} className="card-link">
+            <DonorCard donor={donor} />
+          </NavLink>
+        ))}
+      </HorizontalCarousel>
     </section>
   );
 };

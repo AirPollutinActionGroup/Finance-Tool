@@ -58,6 +58,14 @@ const DonorDetailPage = () => {
             <span>INR {donor.contributionAmount.toLocaleString("en-IN")}</span>
           </div>
           <div className="detail-row">
+            <span>Admin overhead</span>
+            <span>{donor.adminOverheadPercent}%</span>
+          </div>
+          <div className="detail-row">
+            <span>FCRA</span>
+            <span>{donor.fcraApproved ? "Approved" : "Not required"}</span>
+          </div>
+          <div className="detail-row">
             <span>Preferences</span>
             <span>{donor.preferences.length} allocations</span>
           </div>

@@ -1,12 +1,14 @@
-export type GeographyRegion =
-  | "Delhi NCR"
-  | "UP - Prayagraj"
-  | "UP - Banaras"
-  | "UP - Lucknow"
-  | "Bihar - Gaya"
-  | "Bihar - Muzaffarpur";
+export type GeographyState = "Delhi NCR" | "Uttar Pradesh" | "Bihar";
 
-export type DonorType = "International" | "India" | "CSR" | "HNI";
+export type City =
+  | "Delhi"
+  | "Prayagraj"
+  | "Banaras"
+  | "Lucknow"
+  | "Gaya"
+  | "Muzaffarpur";
+
+export type DonorType = "National" | "International" | "CSR" | "HNI";
 
 export type DonorPreference = {
   programId: string;
@@ -17,8 +19,13 @@ export type Employee = {
   id: string;
   name: string;
   role: string;
-  monthlyCost: number;
-  geography: GeographyRegion;
+  joiningDate: string;
+  monthlySalary: number;
+  pfContribution: number;
+  tdsDeduction: number;
+  geography: GeographyState;
+  city: City;
+  programId: string;
   photoUrl: string;
 };
 
@@ -27,6 +34,8 @@ export type Donor = {
   name: string;
   type: DonorType;
   contributionAmount: number;
+  adminOverheadPercent: number;
+  fcraApproved: boolean;
   preferences: DonorPreference[];
 };
 
@@ -34,5 +43,6 @@ export type Program = {
   id: string;
   name: string;
   description: string;
-  geography: GeographyRegion;
+  geography: GeographyState;
+  cities: City[];
 };

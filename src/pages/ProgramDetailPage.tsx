@@ -1,5 +1,5 @@
 import { NavLink, useParams } from "react-router-dom";
-import { donors, programs } from "../data/mockData";
+import { donors, employees, programs } from "../data/mockData";
 
 const ProgramDetailPage = () => {
   const { programId } = useParams();
@@ -19,6 +19,9 @@ const ProgramDetailPage = () => {
 
   const donorCommitments = donors.filter((donor) =>
     donor.preferences.some((preference) => preference.programId === program.id)
+  );
+  const programEmployees = employees.filter(
+    (employee) => employee.programId === program.id
   );
   const preferenceWeights = donorCommitments.map(
     (donor) =>
@@ -54,6 +57,10 @@ const ProgramDetailPage = () => {
             <span>{program.geography}</span>
           </div>
           <div className="detail-row">
+            <span>Cities</span>
+            <span>{program.cities.join(", ")}</span>
+          </div>
+          <div className="detail-row">
             <span>Active donors</span>
             <span>{donorCommitments.length}</span>
           </div>
@@ -80,6 +87,19 @@ const ProgramDetailPage = () => {
               <li key={donor.id} className="detail-list-item">
                 <span>{donor.name}</span>
                 <span>{donor.type}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+        <section className="detail-card">
+          <h2>Assigned employees</h2>
+          <ul className="detail-list">
+            {programEmployees.map((employee) => (
+              <li key={employee.id} className="detail-list-item">
+                <span>{employee.name}</span>
+                <span>
+                  {employee.city}, {employee.geography}
+                </span>
               </li>
             ))}
           </ul>

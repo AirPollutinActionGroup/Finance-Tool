@@ -1,4 +1,6 @@
+import { NavLink } from "react-router-dom";
 import EmployeeCard from "../components/EmployeeCard";
+import HorizontalCarousel from "../components/HorizontalCarousel";
 import { employees } from "../data/mockData";
 
 const EmployeesPage = () => {
@@ -13,15 +15,17 @@ const EmployeesPage = () => {
           <span>{employees.length} employees</span>
         </div>
       </header>
-      <div className="list-layout">
-        <ul className="employee-list">
-          {employees.map((employee) => (
-            <li key={employee.id} className="employee-list-item">
-              <EmployeeCard employee={employee} />
-            </li>
-          ))}
-        </ul>
-      </div>
+      <HorizontalCarousel ariaLabel="Employee cards">
+        {employees.map((employee) => (
+          <NavLink
+            key={employee.id}
+            to={`/employees/${employee.id}`}
+            className="card-link"
+          >
+            <EmployeeCard employee={employee} />
+          </NavLink>
+        ))}
+      </HorizontalCarousel>
     </section>
   );
 };
