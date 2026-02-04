@@ -2,11 +2,29 @@ import type { Employee } from "../types";
 
 type EmployeeCardProps = {
   employee: Employee;
+  onDetails?: () => void;
 };
 
-const EmployeeCard = ({ employee }: EmployeeCardProps) => {
+const EmployeeCard = ({ employee, onDetails }: EmployeeCardProps) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (!onDetails) {
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onDetails();
+    }
+  };
+
   return (
-    <article className="employee-card">
+    <article
+      className="employee-card"
+      role={onDetails ? "button" : undefined}
+      tabIndex={onDetails ? 0 : undefined}
+      onClick={onDetails}
+      onKeyDown={handleKeyDown}
+    >
       <div className="employee-card-media">
         <img src={employee.photoUrl} alt={employee.name} />
       </div>
@@ -23,6 +41,18 @@ const EmployeeCard = ({ employee }: EmployeeCardProps) => {
             INR {employee.monthlySalary.toLocaleString("en-IN")}/mo
           </span>
         </div>
+      </div>
+      <div className="card-footer">
+        <button
+          type="button"
+          className="card-detail-button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onDetails?.();
+          }}
+        >
+          Details
+        </button>
       </div>
     </article>
   );

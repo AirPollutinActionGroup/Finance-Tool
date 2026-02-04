@@ -223,6 +223,39 @@ a {
   display: block;
 }
 
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.card-detail-button {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  background: var(--brand);
+  color: #1f2e2e;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.card-detail-button:hover {
+  background: var(--brand-hover);
+  transform: translateY(-1px);
+}
+
+.employee-card[role="button"],
+.donor-card[role="button"] {
+  cursor: pointer;
+}
+
+.employee-card:focus-visible,
+.donor-card:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
 .employee-card,
 .donor-card,
 .insight-card,
@@ -472,6 +505,95 @@ a {
   margin-top: 8px;
   color: var(--ink-soft);
   font-size: 0.85rem;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  z-index: 30;
+}
+
+.modal-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+  position: relative;
+  width: min(720px, 100%);
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  padding: 24px;
+  box-shadow: var(--shadow-soft);
+  z-index: 1;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.modal-close {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-hero {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.modal-hero img {
+  width: 120px;
+  border-radius: var(--radius-md);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.modal-link {
+  text-decoration: none;
+  color: #1f2e2e;
+  background: var(--brand);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+}
+
+.modal-link:hover {
+  background: var(--brand-hover);
+}
+
+.ghost-button {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 8px 14px;
+  cursor: pointer;
 }
 
 .insight-card ul {
