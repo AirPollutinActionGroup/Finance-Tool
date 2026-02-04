@@ -116,6 +116,51 @@ export const donors: Donor[] = [
   },
 ];
 
+export const donorMovementEvents = [
+  {
+    id: "move-aurora-01",
+    donorId: "donor-aurora",
+    employeeId: "emp-013",
+    summary: "Rahul Bansal moved into DSP funding",
+    date: "2024-10-12",
+  },
+  {
+    id: "move-aurora-02",
+    donorId: "donor-aurora",
+    employeeId: "emp-021",
+    summary: "Aditi Rao added to MRS allocation",
+    date: "2024-09-03",
+  },
+  {
+    id: "move-saras-01",
+    donorId: "donor-saras",
+    employeeId: "emp-008",
+    summary: "Isha Kapoor shifted to DSP coverage",
+    date: "2024-08-22",
+  },
+  {
+    id: "move-pragati-01",
+    donorId: "donor-pragati",
+    employeeId: "emp-033",
+    summary: "Ritika Sen reassigned to C&D focus",
+    date: "2024-08-15",
+  },
+  {
+    id: "move-mehra-01",
+    donorId: "donor-mehra",
+    employeeId: "emp-003",
+    summary: "Rohan Mehta added to DSP support",
+    date: "2024-07-18",
+  },
+  {
+    id: "move-northstar-01",
+    donorId: "donor-northstar",
+    employeeId: "emp-045",
+    summary: "Aakash Singh moved to C&D allocation",
+    date: "2024-07-05",
+  },
+];
+
 type RawEmployee = {
   id: string;
   name: string;
