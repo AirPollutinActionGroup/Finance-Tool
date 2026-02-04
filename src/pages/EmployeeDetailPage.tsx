@@ -46,7 +46,9 @@ const EmployeeDetailPage = () => {
   const buildAllocationScore = (emp: typeof employee) => {
     const tenureMonths = getTenureMonths(emp.joiningDate);
     const tenureBoost = 1 + (Math.min(tenureMonths, 48) / 48) * 0.2;
-    return emp.monthlySalary * tenureBoost;
+    // Use annual salary for allocation score to match annual compensation display
+    const annualSalaryForScore = emp.monthlySalary * 12;
+    return annualSalaryForScore * tenureBoost;
   };
 
   // Group employees by program for score calculation
@@ -152,7 +154,7 @@ const EmployeeDetailPage = () => {
         <section className="detail-card">
           <h2>Donor Contributions</h2>
           <p className="table-note">
-            Percentage of each donor's contribution allocated to this employee's salary.
+            Percentage of each donor's contribution allocated to this employee's annual salary.
           </p>
           <div className="table-wrapper">
             <table className="data-table">
