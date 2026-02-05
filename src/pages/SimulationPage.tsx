@@ -4,7 +4,7 @@ import {
   OPERATIONAL_OVERHEAD,
   runSimulation,
 } from "../simulation/engine";
-import { formatCurrency } from "../utils/format";
+import { formatCurrency, formatPercent } from "../utils/format";
 
 const scenarios = [
   {
@@ -188,6 +188,141 @@ const SimulationPage = () => {
         <div className="chart-card">
           Donor type mix (donut chart placeholder)
         </div>
+      </div>
+
+      {/* Allocation Strategy Recommendations */}
+      {simulation.allocationStrategies && (
+        <section className="detail-card">
+          <h2>💡 Allocation Strategy Recommendations</h2>
+          <p className="table-note">
+            Based on donor scoring, preference matching, and financial optimization
+          </p>
+          <div className="strategy-grid">
+            {simulation.allocationStrategies.map((strategy) => (
+              <div key={strategy.scenarioName} className="strategy-card">
+                <div className="strategy-header">
+                  <h3>{strategy.scenarioName}</h3>
+                  <span className={`strategy-risk-badge risk-${strategy.riskLevel}`}>
+                    {strategy.riskLevel.toUpperCase()} RISK
+                  </span>
+                </div>
+                <p className="strategy-description">{strategy.description}</p>
+                <div className="strategy-metrics">
+                  <div className="strategy-metric">
+                    <span className="strategy-metric-label">Expected Admin Cost</span>
+                    <span className="strategy-metric-value">
+                      {formatCurrency(strategy.expectedAdminCost)}
+                    </span>
+                  </div>
+                  <div className="strategy-metric">
+                    <span className="strategy-metric-label">Expected Runway</span>
+                    <span className="strategy-metric-value">
+                      {strategy.expectedRunway.toFixed(1)} months
+                    </span>
+                  </div>
+                </div>
+                <div className="strategy-recommendations">
+                  <strong>Recommendations:</strong>
+                  <ul>
+                    {strategy.recommendations.map((rec, idx) => (
+                      <li key={idx}>{rec}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <div className="table-grid">
+        {/* Donor Scoring & Rankings */}
+        {simulation.donorScores && (
+          <section className="detail-card">
+            <h2>📊 Donor Scoring & Rankings</h2>
+            <p className="table-note">
+              Scored on admin efficiency, preference match, balance, and flexibility
+            </p>
+            <div className="table-wrapper">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Donor</th>
+                    <th>Total Score</th>
+                    <th>Admin</th>
+                    <th>Preference</th>
+                    <th>Balance</th>
+                    <th>FCRA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {simulation.donorScores.map((score) => (
+                    <tr key={score.donorId}>
+                      <td>
+                        <span className={`rank-badge rank-${score.ranking}`}>
+                          #{score.ranking}
+                        </span>
+                      </td>
+                      <td className="table-cell-title">{score.donorName}</td>
+                      <td>
+                        <strong style={{ color: 'var(--brand)' }}>
+                          {score.totalScore}/100
+                        </strong>
+                      </td>
+                      <td>{score.adminScore}/100</td>
+                      <td>{score.preferenceScore}/100</td>
+                      <td>{score.balanceScore}/100</td>
+                      <td>{score.fcraBonus > 0 ? '✓' : '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+
+        {/* Donor Runway Analysis */}
+        {simulation.donorRunways && (
+          <section className="detail-card">
+            <h2>⏱️ Per-Donor Runway Analysis</h2>
+            <p className="table-note">
+              How long each donor's funds will last at current burn rate
+            </p>
+            <div className="table-wrapper">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Donor</th>
+                    <th>Available Funds</th>
+                    <th>Monthly Allocation</th>
+                    <th>Runway</th>
+                    <th>Depletion Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {simulation.donorRunways.map((runway) => (
+                    <tr key={runway.donorId}>
+                      <td className="table-cell-title">{runway.donorName}</td>
+                      <td>{formatCurrency(runway.availableFunds)}</td>
+                      <td>{formatCurrency(runway.monthlyAllocation)}</td>
+                      <td>
+                        <strong>{runway.runwayMonths.toFixed(1)} months</strong>
+                      </td>
+                      <td>{runway.depletionDate}</td>
+                      <td>
+                        <span className={`status-badge status-${runway.status}`}>
+                          {runway.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
       </div>
 
       <div className="table-grid">
