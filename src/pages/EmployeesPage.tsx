@@ -1,10 +1,8 @@
 import { NavLink } from "react-router-dom";
-import { useState } from "react";
 import EmployeeCard from "../components/EmployeeCard";
 import HorizontalCarousel from "../components/HorizontalCarousel";
-import Drawer from "../components/Drawer";
 import { donors, employees as baseEmployees, programs } from "../data/mockData";
-import { formatCurrency, formatDate, calculateProjectedSalary, calculateProjectedCTC } from "../utils/format";
+import { formatCurrency, formatDate, calculateProjectedSalary } from "../utils/format";
 import { useEmployeeIncrements } from "../hooks/useEmployeeIncrements";
 
 const EmployeesPage = () => {
@@ -16,15 +14,6 @@ const EmployeesPage = () => {
     plannedIncrement: increments[emp.id] || 0,
   }));
 
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(
-    null
-  );
-  const selectedEmployee = employees.find(
-    (employee) => employee.id === selectedEmployeeId
-  );
-  const selectedProgram =
-    programs.find((program) => program.id === selectedEmployee?.programId)?.name ??
-    "Unassigned";
   const donorsByProgram = donors.reduce<Record<string, typeof donors>>(
     (acc, donor) => {
       donor.preferences.forEach((preference) => {
@@ -49,17 +38,16 @@ const EmployeesPage = () => {
       </header>
       <HorizontalCarousel ariaLabel="Employee cards">
         {employees.map((employee) => (
-          <div
+          <NavLink
             key={employee.id}
+            to={`/employees/${employee.id}`}
             className="card-link"
-            role="presentation"
           >
             <EmployeeCard
               employee={employee}
               donorCount={donorsByProgram[employee.programId]?.length ?? 0}
-              onDetails={() => setSelectedEmployeeId(employee.id)}
             />
-          </div>
+          </NavLink>
         ))}
       </HorizontalCarousel>
       <section className="detail-card">
@@ -135,13 +123,12 @@ const EmployeesPage = () => {
                       )}
                     </td>
                     <td>
-                      <button
-                        type="button"
+                      <NavLink
+                        to={`/employees/${employee.id}`}
                         className="table-action"
-                        onClick={() => setSelectedEmployeeId(employee.id)}
                       >
                         Details
-                      </button>
+                      </NavLink>
                     </td>
                   </tr>
                 );
@@ -150,147 +137,6 @@ const EmployeesPage = () => {
           </table>
         </div>
       </section>
-      <Drawer
-        isOpen={Boolean(selectedEmployee)}
-        title="Employee details"
-        onClose={() => setSelectedEmployeeId(null)}
-      >
-        {selectedEmployee ? (
-          <div className="drawer-content-grid">
-            <div className="drawer-hero">
-              <img src={selectedEmployee.photoUrl} alt={selectedEmployee.name} />
-              <div>
-                <p className="detail-eyebrow">Employee</p>
-                <h3>{selectedEmployee.name}</h3>
-                <p className="detail-subtitle">{selectedEmployee.role}</p>
-              </div>
-            </div>
-
-            {/* Increment Planner in Drawer */}
-            <div className="increment-planner">
-              <label htmlFor="drawer-increment-input" className="increment-planner-label">
-                Plan Salary Increment
-              </label>
-              <div className="increment-planner-control">
-                <input
-                  id="drawer-increment-input"
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.5"
-                  value={selectedEmployee.plannedIncrement || 0}
-                  onChange={(e) => setIncrement(selectedEmployee.id, Number(e.target.value))}
-                  className="increment-planner-input"
-                  placeholder="0"
-                />
-                <span className="increment-planner-suffix">%</span>
-              </div>
-              {(selectedEmployee.plannedIncrement || 0) > 0 && (
-                <div className="increment-planner-preview">
-                  Planning {selectedEmployee.plannedIncrement}% increment
-                </div>
-              )}
-            </div>
-
-            <div className="detail-grid">
-              <section className="detail-card">
-                <h2>Profile</h2>
-                <div className="detail-row">
-                  <span>Location</span>
-                  <span>{selectedEmployee.city}, {selectedEmployee.geography}</span>
-                </div>
-                <div className="detail-row">
-                  <span>Program</span>
-                  <span>{selectedProgram}</span>
-                </div>
-                <div className="detail-row">
-                  <span>Joined</span>
-                  <span>{formatDate(selectedEmployee.joiningDate)}</span>
-                </div>
-                <div className="detail-row">
-                  <span>Donors</span>
-                  <span>
-                    {(donorsByProgram[selectedEmployee.programId] ?? [])
-                      .map((donor) => donor.name)
-                      .join(", ") || "—"}
-                  </span>
-                </div>
-              </section>
-
-              <section className="detail-card">
-                <h2>Compensation</h2>
-                {(selectedEmployee.plannedIncrement || 0) > 0 ? (
-                  <div className="compensation-comparison">
-                    <div className="compensation-column">
-                      <h3>Current</h3>
-                      <div className="detail-row">
-                        <span>Annual salary</span>
-                        <span>{formatCurrency(selectedEmployee.monthlySalary * 12)}</span>
-                      </div>
-                      <div className="detail-row">
-                        <span>Annual CTC</span>
-                        <span>{formatCurrency((selectedEmployee.monthlySalary + selectedEmployee.pfContribution) * 12)}</span>
-                      </div>
-                    </div>
-                    <div className="compensation-column projected">
-                      <h3>Projected (+{selectedEmployee.plannedIncrement}%)</h3>
-                      {(() => {
-                        const proj = calculateProjectedCTC(selectedEmployee.monthlySalary, selectedEmployee.plannedIncrement || 0);
-                        return (
-                          <>
-                            <div className="detail-row">
-                              <span>Annual salary</span>
-                              <span>{formatCurrency(proj.salary)}</span>
-                            </div>
-                            <div className="detail-row">
-                              <span>Annual CTC</span>
-                              <span className="projected-highlight">{formatCurrency(proj.ctc)}</span>
-                            </div>
-                          </>
-                        );
-                      })()}
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="detail-row">
-                      <span>Annual salary</span>
-                      <span>{formatCurrency(selectedEmployee.monthlySalary * 12)}</span>
-                    </div>
-                    <div className="detail-row">
-                      <span>Annual PF contribution</span>
-                      <span>{formatCurrency(selectedEmployee.pfContribution * 12)}</span>
-                    </div>
-                    <div className="detail-row">
-                      <span>Annual CTC</span>
-                      <span>{formatCurrency((selectedEmployee.monthlySalary + selectedEmployee.pfContribution) * 12)}</span>
-                    </div>
-                    <div className="detail-row">
-                      <span>Annual TDS deduction</span>
-                      <span>{formatCurrency(selectedEmployee.tdsDeduction * 12)}</span>
-                    </div>
-                  </>
-                )}
-              </section>
-            </div>
-            <div className="drawer-actions">
-              <NavLink
-                to={`/employees/${selectedEmployee.id}`}
-                className="modal-link"
-              >
-                Open full profile
-              </NavLink>
-              <button
-                type="button"
-                className="ghost-button"
-                onClick={() => setSelectedEmployeeId(null)}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        ) : null}
-      </Drawer>
     </section>
   );
 };

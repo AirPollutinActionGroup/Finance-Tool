@@ -7,25 +7,8 @@ type DonorCardProps = {
 };
 
 const DonorCard = ({ donor, onDetails }: DonorCardProps) => {
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
-    if (!onDetails) {
-      return;
-    }
-
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      onDetails();
-    }
-  };
-
   return (
-    <article
-      className="donor-card"
-      role={onDetails ? "button" : undefined}
-      tabIndex={onDetails ? 0 : undefined}
-      onClick={onDetails}
-      onKeyDown={handleKeyDown}
-    >
+    <article className="donor-card">
       <div className="donor-card-body">
         <div>
           <h2>{donor.name}</h2>
@@ -38,18 +21,6 @@ const DonorCard = ({ donor, onDetails }: DonorCardProps) => {
         <div className="donor-card-value">
           {formatCurrency(donor.contributionAmount)}
         </div>
-      </div>
-      <div className="card-footer">
-        <button
-          type="button"
-          className="card-detail-button"
-          onClick={(event) => {
-            event.stopPropagation();
-            onDetails?.();
-          }}
-        >
-          Details
-        </button>
       </div>
     </article>
   );

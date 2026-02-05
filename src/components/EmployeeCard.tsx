@@ -12,25 +12,8 @@ const EmployeeCard = ({
   onDetails,
   donorCount,
 }: EmployeeCardProps) => {
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
-    if (!onDetails) {
-      return;
-    }
-
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      onDetails();
-    }
-  };
-
   return (
-    <article
-      className="employee-card"
-      role={onDetails ? "button" : undefined}
-      tabIndex={onDetails ? 0 : undefined}
-      onClick={onDetails}
-      onKeyDown={handleKeyDown}
-    >
+    <article className="employee-card">
       <div className="employee-card-media">
         <img src={employee.photoUrl} alt={employee.name} />
       </div>
@@ -50,18 +33,6 @@ const EmployeeCard = ({
             <span>{donorCount} donors</span>
           ) : null}
         </div>
-      </div>
-      <div className="card-footer">
-        <button
-          type="button"
-          className="card-detail-button"
-          onClick={(event) => {
-            event.stopPropagation();
-            onDetails?.();
-          }}
-        >
-          Details
-        </button>
       </div>
     </article>
   );
