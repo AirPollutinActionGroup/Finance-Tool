@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
-import { donors, employees, programs } from "../data/mockData";
+import { donors, employees as baseEmployees, programs } from "../data/mockData";
 import {
   OPERATIONAL_OVERHEAD,
   runSimulation,
 } from "../simulation/engine";
-import { formatCurrency, formatPercent } from "../utils/format";
+import { formatCurrency, formatPercent, calculateProjectedSalary } from "../utils/format";
+import { useEmployeeIncrements } from "../hooks/useEmployeeIncrements";
 
 const scenarios = [
   {
@@ -80,6 +81,7 @@ const scenarios = [
 ];
 
 const SimulationPage = () => {
+  const { increments, hasAnyIncrements } = useEmployeeIncrements();
   const [activeScenarioId, setActiveScenarioId] = useState(scenarios[0].id);
   const [salaryMultiplier, setSalaryMultiplier] = useState(1);
   const [donorMultiplier, setDonorMultiplier] = useState(1);
@@ -89,9 +91,25 @@ const SimulationPage = () => {
     (scenario) => scenario.id === activeScenarioId
   )!;
 
+  // Apply individual increments to create base employees
+  const employees = baseEmployees.map(emp => {
+    const increment = increments[emp.id] || 0;
+    if (increment > 0) {
+      const projectedMonthly = calculateProjectedSalary(emp.monthlySalary, increment);
+      return {
+        ...emp,
+        monthlySalary: projectedMonthly,
+        pfContribution: Math.round(projectedMonthly * 0.12),
+        tdsDeduction: Math.round(projectedMonthly * 0.1),
+        plannedIncrement: increment,
+      };
+    }
+    return { ...emp, plannedIncrement: 0 };
+  });
+
   // Baseline simulation (current state) for comparison
   const baselineSimulation = useMemo(() => {
-    return runSimulation(donors, programs, employees, OPERATIONAL_OVERHEAD);
+    return runSimulation(donors, programs, baseEmployees, OPERATIONAL_OVERHEAD);
   }, []);
 
   const simulation = useMemo(() => {
@@ -139,6 +157,11 @@ const SimulationPage = () => {
         <div>
           <h1>Simulation</h1>
           <p>Model funding scenarios and see live allocation impacts.</p>
+          {hasAnyIncrements && (
+            <div className="planning-notice">
+              ℹ️ Individual employee increments are included in all calculations
+            </div>
+          )}
         </div>
       </header>
 

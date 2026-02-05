@@ -27,6 +27,7 @@ export type Employee = {
   city: City;
   programId: string;
   photoUrl: string;
+  plannedIncrement?: number; // Percentage increment for planning (0-100)
 };
 
 export type Donor = {

@@ -2,13 +2,31 @@ import { NavLink, useParams } from "react-router-dom";
 import {
   donorMovementEvents,
   donors,
-  employees,
+  employees as baseEmployees,
   programs,
 } from "../data/mockData";
-import { formatCurrency, formatDate, formatPercent } from "../utils/format";
+import { formatCurrency, formatDate, formatPercent, calculateProjectedSalary } from "../utils/format";
+import { useEmployeeIncrements } from "../hooks/useEmployeeIncrements";
 
 const DonorDetailPage = () => {
   const { donorId } = useParams();
+  const { increments } = useEmployeeIncrements();
+
+  // Apply individual increments to employees
+  const employees = baseEmployees.map(emp => {
+    const increment = increments[emp.id] || 0;
+    if (increment > 0) {
+      const projectedMonthly = calculateProjectedSalary(emp.monthlySalary, increment);
+      return {
+        ...emp,
+        monthlySalary: projectedMonthly,
+        pfContribution: Math.round(projectedMonthly * 0.12),
+        tdsDeduction: Math.round(projectedMonthly * 0.1),
+        plannedIncrement: increment,
+      };
+    }
+    return { ...emp, plannedIncrement: 0 };
+  });
 
   const donor = donors.find((item) => item.id === donorId);
 

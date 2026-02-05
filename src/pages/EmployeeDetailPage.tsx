@@ -1,9 +1,11 @@
 import { NavLink, useParams } from "react-router-dom";
 import { donors, employees, programs } from "../data/mockData";
-import { formatCurrency, formatDate, formatPercent } from "../utils/format";
+import { formatCurrency, formatDate, formatPercent, calculateProjectedCTC } from "../utils/format";
+import { useEmployeeIncrements } from "../hooks/useEmployeeIncrements";
 
 const EmployeeDetailPage = () => {
   const { employeeId } = useParams();
+  const { getIncrement, setIncrement, resetEmployee } = useEmployeeIncrements();
 
   const employee = employees.find((item) => item.id === employeeId);
 
@@ -22,11 +24,18 @@ const EmployeeDetailPage = () => {
     programs.find((item) => item.id === employee.programId)?.name ??
     "Unassigned";
 
-  // Calculate annual figures
+  // Get planned increment
+  const plannedIncrement = getIncrement(employee.id);
+
+  // Calculate current annual figures
   const annualSalary = employee.monthlySalary * 12;
   const annualPF = employee.pfContribution * 12;
   const annualTDS = employee.tdsDeduction * 12;
   const annualCTC = annualSalary + annualPF;
+
+  // Calculate projected figures with increment
+  const projected = calculateProjectedCTC(employee.monthlySalary, plannedIncrement);
+  const hasIncrement = plannedIncrement > 0;
 
   // Calculate donor contributions using same logic as DonorDetailPage
   const referenceDate = new Date(Date.UTC(2025, 0, 1));
@@ -133,22 +142,93 @@ const EmployeeDetailPage = () => {
           </div>
         </section>
         <section className="detail-card">
-          <h2>Compensation</h2>
-          <div className="detail-row">
-            <span>Annual salary</span>
-            <span>{formatCurrency(annualSalary)}</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-md)' }}>
+            <h2>Compensation</h2>
+            {hasIncrement && (
+              <button
+                type="button"
+                className="ghost-button"
+                onClick={() => resetEmployee(employee.id)}
+                style={{ fontSize: '0.75rem', padding: 'var(--space-xs) var(--space-sm)' }}
+              >
+                Reset Increment
+              </button>
+            )}
           </div>
-          <div className="detail-row">
-            <span>Annual PF contribution</span>
-            <span>{formatCurrency(annualPF)}</span>
+          
+          <div className="increment-planner">
+            <label htmlFor="increment-input" className="increment-planner-label">
+              Plan Salary Increment
+            </label>
+            <div className="increment-planner-control">
+              <input
+                id="increment-input"
+                type="number"
+                min="0"
+                max="100"
+                step="0.5"
+                value={plannedIncrement}
+                onChange={(e) => setIncrement(employee.id, Number(e.target.value))}
+                className="increment-planner-input"
+                placeholder="0"
+              />
+              <span className="increment-planner-suffix">%</span>
+            </div>
+            {hasIncrement && (
+              <div className="increment-planner-preview">
+                Planning {plannedIncrement}% increment
+              </div>
+            )}
           </div>
-          <div className="detail-row">
-            <span>Annual CTC</span>
-            <span>{formatCurrency(annualCTC)}</span>
-          </div>
-          <div className="detail-row">
-            <span>Annual TDS deduction</span>
-            <span>{formatCurrency(annualTDS)}</span>
+
+          <div className="compensation-comparison">
+            <div className="compensation-column">
+              <h3>Current</h3>
+              <div className="detail-row">
+                <span>Annual salary</span>
+                <span>{formatCurrency(annualSalary)}</span>
+              </div>
+              <div className="detail-row">
+                <span>Annual PF contribution</span>
+                <span>{formatCurrency(annualPF)}</span>
+              </div>
+              <div className="detail-row">
+                <span>Annual CTC</span>
+                <span>{formatCurrency(annualCTC)}</span>
+              </div>
+              <div className="detail-row">
+                <span>Annual TDS deduction</span>
+                <span>{formatCurrency(annualTDS)}</span>
+              </div>
+            </div>
+            
+            {hasIncrement && (
+              <div className="compensation-column projected">
+                <h3>Projected (+{plannedIncrement}%)</h3>
+                <div className="detail-row">
+                  <span>Annual salary</span>
+                  <span>{formatCurrency(projected.salary)}</span>
+                </div>
+                <div className="detail-row">
+                  <span>Annual PF contribution</span>
+                  <span>{formatCurrency(projected.pf)}</span>
+                </div>
+                <div className="detail-row">
+                  <span>Annual CTC</span>
+                  <span className="projected-highlight">{formatCurrency(projected.ctc)}</span>
+                </div>
+                <div className="detail-row">
+                  <span>Annual TDS deduction</span>
+                  <span>{formatCurrency(Math.round(projected.salary * 0.1))}</span>
+                </div>
+                <div className="detail-row highlight">
+                  <span>CTC Increase</span>
+                  <span className="increase-amount">
+                    +{formatCurrency(projected.ctc - annualCTC)}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </section>
         <section className="detail-card">

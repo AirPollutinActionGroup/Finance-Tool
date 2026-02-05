@@ -3,10 +3,19 @@ import { useState } from "react";
 import EmployeeCard from "../components/EmployeeCard";
 import HorizontalCarousel from "../components/HorizontalCarousel";
 import Modal from "../components/Modal";
-import { donors, employees, programs } from "../data/mockData";
-import { formatCurrency, formatDate } from "../utils/format";
+import { donors, employees as baseEmployees, programs } from "../data/mockData";
+import { formatCurrency, formatDate, calculateProjectedSalary } from "../utils/format";
+import { useEmployeeIncrements } from "../hooks/useEmployeeIncrements";
 
 const EmployeesPage = () => {
+  const { increments, setIncrement, resetAll, hasAnyIncrements } = useEmployeeIncrements();
+  
+  // Apply increments to employees
+  const employees = baseEmployees.map(emp => ({
+    ...emp,
+    plannedIncrement: increments[emp.id] || 0,
+  }));
+
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(
     null
   );
@@ -54,7 +63,22 @@ const EmployeesPage = () => {
         ))}
       </HorizontalCarousel>
       <section className="detail-card">
-        <h2>Employee Directory</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-md)' }}>
+          <h2>Employee Directory</h2>
+          {hasAnyIncrements && (
+            <button
+              type="button"
+              className="ghost-button"
+              onClick={resetAll}
+              style={{ fontSize: '0.875rem' }}
+            >
+              Reset All Increments
+            </button>
+          )}
+        </div>
+        <p className="table-note">
+          Set individual increment % to plan salary adjustments. Projections shown in simulation.
+        </p>
         <div className="table-wrapper">
           <table className="data-table">
             <thead>
@@ -63,9 +87,9 @@ const EmployeesPage = () => {
                 <th>Role</th>
                 <th>Program</th>
                 <th>Location</th>
-                <th>Joining</th>
-                <th>Annual Salary</th>
-                <th>Donors</th>
+                <th>Increment %</th>
+                <th>Current Salary</th>
+                <th>Projected Salary</th>
                 <th></th>
               </tr>
             </thead>
@@ -74,7 +98,10 @@ const EmployeesPage = () => {
                 const programName =
                   programs.find((program) => program.id === employee.programId)
                     ?.name ?? "Unassigned";
-                const employeeDonors = donorsByProgram[employee.programId] ?? [];
+                const increment = employee.plannedIncrement || 0;
+                const currentAnnual = employee.monthlySalary * 12;
+                const projectedMonthly = calculateProjectedSalary(employee.monthlySalary, increment);
+                const projectedAnnual = projectedMonthly * 12;
 
                 return (
                   <tr key={employee.id}>
@@ -84,12 +111,28 @@ const EmployeesPage = () => {
                     <td>
                       {employee.city}, {employee.geography}
                     </td>
-                    <td>{formatDate(employee.joiningDate)}</td>
-                    <td>{formatCurrency(employee.monthlySalary * 12)}</td>
                     <td>
-                      {employeeDonors.length
-                        ? employeeDonors.map((donor) => donor.name).join(", ")
-                        : "—"}
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.5"
+                        value={increment}
+                        onChange={(e) => setIncrement(employee.id, Number(e.target.value))}
+                        className="increment-input"
+                        placeholder="0"
+                      />
+                    </td>
+                    <td>{formatCurrency(currentAnnual)}</td>
+                    <td>
+                      {increment > 0 ? (
+                        <div className="projected-salary">
+                          <strong>{formatCurrency(projectedAnnual)}</strong>
+                          <span className="increment-badge">+{increment}%</span>
+                        </div>
+                      ) : (
+                        <span style={{ color: 'var(--ink-muted)' }}>—</span>
+                      )}
                     </td>
                     <td>
                       <button

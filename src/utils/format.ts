@@ -18,3 +18,25 @@ export const formatDate = (value: string) => {
     year: "numeric",
   });
 };
+
+export const calculateProjectedSalary = (
+  currentSalary: number,
+  incrementPercent: number
+): number => {
+  return Math.round(currentSalary * (1 + incrementPercent / 100));
+};
+
+export const calculateProjectedCTC = (
+  monthlySalary: number,
+  incrementPercent: number
+): { salary: number; pf: number; ctc: number } => {
+  const projectedSalary = calculateProjectedSalary(monthlySalary, incrementPercent);
+  const projectedPF = Math.round(projectedSalary * 0.12);
+  const projectedCTC = (projectedSalary + projectedPF) * 12;
+  
+  return {
+    salary: projectedSalary * 12,
+    pf: projectedPF * 12,
+    ctc: projectedCTC,
+  };
+};

@@ -2106,6 +2106,172 @@ a {
   border: 1px solid var(--error);
 }
 
+/* Increment Planning */
+.increment-input {
+  width: 70px;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--ink);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  transition: all var(--transition-base);
+}
+
+.increment-input:focus {
+  border-color: var(--brand);
+  background: var(--card);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-shadow);
+}
+
+.increment-input:hover {
+  border-color: var(--border-hover);
+}
+
+.projected-salary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.projected-salary strong {
+  color: var(--brand);
+}
+
+.increment-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--success-bg);
+  color: var(--success);
+  border-radius: var(--radius-full);
+}
+
+.increment-planner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  margin-bottom: var(--space-lg);
+}
+
+.increment-planner-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink-secondary);
+}
+
+.increment-planner-control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.increment-planner-input {
+  flex: 1;
+  max-width: 120px;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--ink);
+  border-radius: var(--radius-md);
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-align: center;
+  transition: all var(--transition-base);
+}
+
+.increment-planner-input:focus {
+  border-color: var(--brand);
+  background: var(--card);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--brand-shadow);
+}
+
+.increment-planner-suffix {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+
+.increment-planner-preview {
+  font-size: 0.875rem;
+  color: var(--success);
+  font-weight: 500;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--success-bg);
+  border-radius: var(--radius-sm);
+  display: inline-block;
+}
+
+.compensation-comparison {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+}
+
+.compensation-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.compensation-column.projected {
+  padding: var(--space-md);
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--brand);
+}
+
+.compensation-column h3 {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-muted);
+  margin-bottom: var(--space-sm);
+  font-weight: 600;
+}
+
+.compensation-column.projected h3 {
+  color: var(--brand);
+}
+
+.projected-highlight {
+  color: var(--brand);
+  font-weight: 700;
+}
+
+.detail-row.highlight {
+  background: var(--brand-shadow);
+  padding: var(--space-sm);
+  border-radius: var(--radius-sm);
+  margin-top: var(--space-md);
+}
+
+.increase-amount {
+  color: var(--success);
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.planning-notice {
+  margin-top: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--brand-shadow);
+  border-left: 3px solid var(--brand);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  color: var(--ink-secondary);
+  font-weight: 500;
+}
+
 /* Utility Classes */
 .sr-only {
   position: absolute;
