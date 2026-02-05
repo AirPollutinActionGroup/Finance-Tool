@@ -199,6 +199,9 @@ const DashboardPage = () => {
                 <div className="admin-threshold-footer">
                   <span>Contribution: {formatCurrency(donor.contributionAmount)}</span>
                   <span>Baseline: {formatPercent(baseline)}</span>
+                  <span className="admin-threshold-usage" data-status={status}>
+                    Using {percentOfBaseline.toFixed(1)}% of baseline
+                  </span>
                 </div>
               </div>
             ))}
