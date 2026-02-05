@@ -8,28 +8,74 @@ import { formatCurrency, formatPercent } from "../utils/format";
 
 const scenarios = [
   {
-    id: "baseline",
-    name: "Baseline",
-    description: "Current funding and payroll levels.",
+    id: "current",
+    name: "📊 Current State",
+    description: "Your actual funding and costs as they are today",
+    impact: "Shows your real financial position with no changes",
+    icon: "📊",
     donorMultiplier: 1,
     salaryMultiplier: 1,
     overheadMultiplier: 1,
   },
   {
-    id: "growth",
-    name: "Growth",
-    description: "Scaled funding with higher staffing costs.",
-    donorMultiplier: 1.15,
+    id: "new-hire",
+    name: "👥 New Hire Planning",
+    description: "Planning to hire 2-3 new employees",
+    impact: "Increases salaries by 15%, maintains current funding",
+    icon: "👥",
+    donorMultiplier: 1,
+    salaryMultiplier: 1.15,
+    overheadMultiplier: 1.05,
+  },
+  {
+    id: "donor-exit",
+    name: "🚨 Donor Exit Scenario",
+    description: "What if a major donor withdraws?",
+    impact: "Reduces funding by 20%, maintains current costs",
+    icon: "🚨",
+    donorMultiplier: 0.8,
+    salaryMultiplier: 1,
+    overheadMultiplier: 1,
+  },
+  {
+    id: "salary-increment",
+    name: "💰 Annual Increment",
+    description: "Planning 10% annual salary increases",
+    impact: "Increases all salaries by 10%, maintains funding",
+    icon: "💰",
+    donorMultiplier: 1,
     salaryMultiplier: 1.1,
+    overheadMultiplier: 1,
+  },
+  {
+    id: "expansion",
+    name: "🎯 Program Expansion",
+    description: "Adding new geography or program",
+    impact: "Increases funding 15%, costs 12%, overhead 10%",
+    icon: "🎯",
+    donorMultiplier: 1.15,
+    salaryMultiplier: 1.12,
     overheadMultiplier: 1.1,
   },
   {
-    id: "conservative",
-    name: "Conservative",
-    description: "Lower funding with tighter operating costs.",
-    donorMultiplier: 0.9,
-    salaryMultiplier: 0.95,
-    overheadMultiplier: 0.9,
+    id: "emergency",
+    name: "⚡ Emergency Mode",
+    description: "Cost-cutting to extend runway",
+    impact: "Reduces costs 10%, funding may drop 5%",
+    icon: "⚡",
+    donorMultiplier: 0.95,
+    salaryMultiplier: 0.9,
+    overheadMultiplier: 0.85,
+  },
+  {
+    id: "custom",
+    name: "⚙️ Custom Scenario",
+    description: "Adjust all parameters manually",
+    impact: "Full control over all financial variables",
+    icon: "⚙️",
+    donorMultiplier: 1,
+    salaryMultiplier: 1,
+    overheadMultiplier: 1,
   },
 ];
 
@@ -42,6 +88,11 @@ const SimulationPage = () => {
   const activeScenario = scenarios.find(
     (scenario) => scenario.id === activeScenarioId
   )!;
+
+  // Baseline simulation (current state) for comparison
+  const baselineSimulation = useMemo(() => {
+    return runSimulation(donors, programs, employees, OPERATIONAL_OVERHEAD);
+  }, []);
 
   const simulation = useMemo(() => {
     const effectiveSalaryMultiplier =
@@ -92,64 +143,160 @@ const SimulationPage = () => {
       </header>
 
       <div className="simulation-controls">
-        <div className="scenario-selector">
+        <div>
+          <h2 style={{ marginBottom: 'var(--space-sm)' }}>What do you want to simulate?</h2>
+          <p className="table-note">Choose a scenario to see its financial impact</p>
+        </div>
+        <div className="scenario-selector-grid">
           {scenarios.map((scenario) => (
             <button
               key={scenario.id}
               type="button"
-              className={scenario.id === activeScenarioId ? "tab active" : "tab"}
+              className={scenario.id === activeScenarioId ? "scenario-card active" : "scenario-card"}
               onClick={() => setActiveScenarioId(scenario.id)}
             >
-              <strong>{scenario.name}</strong>
-              <span>{scenario.description}</span>
+              <div className="scenario-card-icon">{scenario.icon}</div>
+              <div className="scenario-card-content">
+                <strong>{scenario.name}</strong>
+                <span className="scenario-card-description">{scenario.description}</span>
+                <span className="scenario-card-impact">{scenario.impact}</span>
+              </div>
             </button>
           ))}
         </div>
-        <div className="manual-controls">
-          <div className="control-group">
-            <label htmlFor="salaryMultiplier">Salary multiplier</label>
-            <input
-              id="salaryMultiplier"
-              type="range"
-              min="0.8"
-              max="1.2"
-              step="0.01"
-              value={salaryMultiplier}
-              onChange={(event) =>
-                setSalaryMultiplier(Number(event.target.value))
-              }
-            />
-            <span>{salaryMultiplier.toFixed(2)}x</span>
+        
+        {activeScenarioId === 'custom' && (
+          <div className="manual-controls">
+            <h3>Adjust Parameters</h3>
+            <div className="control-group">
+              <div className="control-header">
+                <label htmlFor="salaryMultiplier">Staff Costs</label>
+                <span className="control-value">{salaryMultiplier > 1 ? '▲' : salaryMultiplier < 1 ? '▼' : '='} {((salaryMultiplier - 1) * 100).toFixed(0)}%</span>
+              </div>
+              <input
+                id="salaryMultiplier"
+                type="range"
+                min="0.7"
+                max="1.3"
+                step="0.01"
+                value={salaryMultiplier}
+                onChange={(event) =>
+                  setSalaryMultiplier(Number(event.target.value))
+                }
+              />
+              <div className="control-impact">
+                Current: {formatCurrency(baselineSimulation.monthlyBurn)} → 
+                Projected: {formatCurrency(simulation.monthlyBurn)}
+              </div>
+            </div>
+            <div className="control-group">
+              <div className="control-header">
+                <label htmlFor="donorMultiplier">Donor Funding</label>
+                <span className="control-value">{donorMultiplier > 1 ? '▲' : donorMultiplier < 1 ? '▼' : '='} {((donorMultiplier - 1) * 100).toFixed(0)}%</span>
+              </div>
+              <input
+                id="donorMultiplier"
+                type="range"
+                min="0.7"
+                max="1.3"
+                step="0.01"
+                value={donorMultiplier}
+                onChange={(event) =>
+                  setDonorMultiplier(Number(event.target.value))
+                }
+              />
+              <div className="control-impact">
+                Current: {formatCurrency(baselineSimulation.totalContributions)} → 
+                Projected: {formatCurrency(simulation.totalContributions)}
+              </div>
+            </div>
+            <div className="control-group">
+              <div className="control-header">
+                <label htmlFor="overheadInput">Monthly Overhead</label>
+                <span className="control-help">Rent, utilities, admin costs</span>
+              </div>
+              <input
+                id="overheadInput"
+                type="number"
+                min="0"
+                step="10000"
+                value={manualOverhead}
+                onChange={(event) =>
+                  setManualOverhead(Number(event.target.value))
+                }
+              />
+              <div className="control-impact">
+                Includes: Office rent, utilities, admin salaries, software, etc.
+              </div>
+            </div>
           </div>
-          <div className="control-group">
-            <label htmlFor="donorMultiplier">Donor funding multiplier</label>
-            <input
-              id="donorMultiplier"
-              type="range"
-              min="0.8"
-              max="1.2"
-              step="0.01"
-              value={donorMultiplier}
-              onChange={(event) =>
-                setDonorMultiplier(Number(event.target.value))
-              }
-            />
-            <span>{donorMultiplier.toFixed(2)}x</span>
-          </div>
-          <div className="control-group">
-            <label htmlFor="overheadInput">Operational overhead</label>
-            <input
-              id="overheadInput"
-              type="number"
-              min="0"
-              value={manualOverhead}
-              onChange={(event) =>
-                setManualOverhead(Number(event.target.value))
-              }
-            />
-          </div>
-        </div>
+        )}
       </div>
+
+      {/* Impact Comparison Display */}
+      {activeScenarioId !== 'current' && (
+        <section className="impact-comparison">
+          <h2>📊 Impact Analysis</h2>
+          <p className="table-note">Comparing {activeScenario.name} to current state</p>
+          <div className="impact-grid">
+            <div className="impact-card">
+              <div className="impact-label">Monthly Burn Rate</div>
+              <div className="impact-values">
+                <span className="impact-before">{formatCurrency(baselineSimulation.monthlyBurn)}</span>
+                <span className="impact-arrow">→</span>
+                <span className="impact-after">{formatCurrency(simulation.monthlyBurn)}</span>
+              </div>
+              <div className={`impact-change ${simulation.monthlyBurn > baselineSimulation.monthlyBurn ? 'negative' : 'positive'}`}>
+                {simulation.monthlyBurn > baselineSimulation.monthlyBurn ? '▲' : '▼'} 
+                {formatCurrency(Math.abs(simulation.monthlyBurn - baselineSimulation.monthlyBurn))}
+                ({((simulation.monthlyBurn / baselineSimulation.monthlyBurn - 1) * 100).toFixed(1)}%)
+              </div>
+            </div>
+            
+            <div className="impact-card">
+              <div className="impact-label">Total Funding</div>
+              <div className="impact-values">
+                <span className="impact-before">{formatCurrency(baselineSimulation.totalContributions)}</span>
+                <span className="impact-arrow">→</span>
+                <span className="impact-after">{formatCurrency(simulation.totalContributions)}</span>
+              </div>
+              <div className={`impact-change ${simulation.totalContributions > baselineSimulation.totalContributions ? 'positive' : 'negative'}`}>
+                {simulation.totalContributions > baselineSimulation.totalContributions ? '▲' : '▼'} 
+                {formatCurrency(Math.abs(simulation.totalContributions - baselineSimulation.totalContributions))}
+                ({((simulation.totalContributions / baselineSimulation.totalContributions - 1) * 100).toFixed(1)}%)
+              </div>
+            </div>
+            
+            <div className="impact-card">
+              <div className="impact-label">Admin Costs</div>
+              <div className="impact-values">
+                <span className="impact-before">{formatCurrency(baselineSimulation.totalAdminCost)}</span>
+                <span className="impact-arrow">→</span>
+                <span className="impact-after">{formatCurrency(simulation.totalAdminCost)}</span>
+              </div>
+              <div className={`impact-change ${simulation.totalAdminCost < baselineSimulation.totalAdminCost ? 'positive' : 'negative'}`}>
+                {simulation.totalAdminCost > baselineSimulation.totalAdminCost ? '▲' : '▼'} 
+                {formatCurrency(Math.abs(simulation.totalAdminCost - baselineSimulation.totalAdminCost))}
+                ({((simulation.totalAdminCost / baselineSimulation.totalAdminCost - 1) * 100).toFixed(1)}%)
+              </div>
+            </div>
+            
+            <div className="impact-card highlight">
+              <div className="impact-label">Runway</div>
+              <div className="impact-values">
+                <span className="impact-before">{baselineSimulation.runwayMonths.toFixed(1)} months</span>
+                <span className="impact-arrow">→</span>
+                <span className="impact-after">{simulation.runwayMonths.toFixed(1)} months</span>
+              </div>
+              <div className={`impact-change ${simulation.runwayMonths > baselineSimulation.runwayMonths ? 'positive' : 'negative'}`}>
+                {simulation.runwayMonths > baselineSimulation.runwayMonths ? '▲' : '▼'} 
+                {Math.abs(simulation.runwayMonths - baselineSimulation.runwayMonths).toFixed(1)} months
+                ({((simulation.runwayMonths / baselineSimulation.runwayMonths - 1) * 100).toFixed(1)}%)
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className="metric-grid">
         <div className="metric-card">
