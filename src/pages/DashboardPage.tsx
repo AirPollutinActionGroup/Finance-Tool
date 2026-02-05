@@ -160,16 +160,33 @@ const DashboardPage = () => {
               <div key={donor.id} className="admin-threshold-item">
                 <div className="admin-threshold-header">
                   <div className="admin-threshold-info">
-                    <span className="admin-threshold-name">{donor.name}</span>
-                    <span className="admin-threshold-type">{donor.type}</span>
+                    <div className="admin-threshold-title">
+                      <span className="admin-threshold-name">{donor.name}</span>
+                      <span className="admin-threshold-type">{donor.type}</span>
+                    </div>
+                    <div className="admin-threshold-contribution">
+                      {formatCurrency(donor.contributionAmount)} contribution
+                    </div>
                   </div>
-                  <div className="admin-threshold-values">
-                    <span className="admin-threshold-actual">
-                      {formatPercent(actual)}
-                    </span>
-                    <span className="admin-threshold-difference" data-status={status}>
-                      {difference > 0 ? '+' : ''}{difference.toFixed(1)}%
-                    </span>
+                  <div className="admin-threshold-metrics">
+                    <div className="admin-threshold-metric">
+                      <span className="admin-threshold-metric-label">Actual</span>
+                      <span className="admin-threshold-metric-value" data-status={status}>
+                        {formatPercent(actual)}
+                      </span>
+                    </div>
+                    <div className="admin-threshold-metric">
+                      <span className="admin-threshold-metric-label">Baseline</span>
+                      <span className="admin-threshold-metric-value">
+                        {formatPercent(baseline)}
+                      </span>
+                    </div>
+                    <div className="admin-threshold-metric">
+                      <span className="admin-threshold-metric-label">Variance</span>
+                      <span className="admin-threshold-metric-value" data-status={status}>
+                        {difference > 0 ? '+' : ''}{difference.toFixed(1)}%
+                      </span>
+                    </div>
                   </div>
                 </div>
                 <div className="admin-threshold-bar-container">
@@ -182,9 +199,7 @@ const DashboardPage = () => {
                     <div className="admin-threshold-zone critical" style={{ width: '40%' }} />
                     {/* Baseline marker */}
                     <div className="admin-threshold-baseline" style={{ left: '50%' }}>
-                      <span className="admin-threshold-baseline-label">
-                        {formatPercent(baseline)}
-                      </span>
+                      <span className="admin-threshold-baseline-label">Target</span>
                     </div>
                     {/* Actual value indicator */}
                     <div 
@@ -193,14 +208,33 @@ const DashboardPage = () => {
                       style={{ 
                         left: `${Math.min(Math.max((percentOfBaseline - 80) * 2.5, 0), 100)}%` 
                       }}
-                    />
+                    >
+                      <span className="admin-threshold-indicator-label">
+                        {formatPercent(actual)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="admin-threshold-bar-labels">
+                    <span className="admin-threshold-bar-label">Below Target</span>
+                    <span className="admin-threshold-bar-label">Near Target</span>
+                    <span className="admin-threshold-bar-label">Above Target</span>
                   </div>
                 </div>
                 <div className="admin-threshold-footer">
-                  <span>Contribution: {formatCurrency(donor.contributionAmount)}</span>
-                  <span>Baseline: {formatPercent(baseline)}</span>
-                  <span className="admin-threshold-usage" data-status={status}>
-                    Using {percentOfBaseline.toFixed(1)}% of baseline
+                  <div className="admin-threshold-status-badge" data-status={status}>
+                    <span className="admin-threshold-status-icon">
+                      {status === 'safe' && '✓'}
+                      {status === 'warning' && '⚠'}
+                      {status === 'critical' && '⚠'}
+                    </span>
+                    <span>
+                      {status === 'safe' && 'Below Threshold'}
+                      {status === 'warning' && 'Near Threshold'}
+                      {status === 'critical' && 'Above Threshold'}
+                    </span>
+                  </div>
+                  <span className="admin-threshold-usage-text">
+                    Consuming <strong>{percentOfBaseline.toFixed(1)}%</strong> of allowed baseline
                   </span>
                 </div>
               </div>
