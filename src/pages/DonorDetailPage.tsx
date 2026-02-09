@@ -8,11 +8,13 @@ import {
 import { formatCurrency, formatDate, formatPercent, calculateProjectedSalary } from "../utils/format";
 import { useEmployeeIncrements } from "../hooks/useEmployeeIncrements";
 import { useEmployeeOverrides, applyEmployeeOverrides } from "../hooks/useEmployeeOverrides";
+import { useDonorOverrides, applyDonorPreferenceOverrides } from "../hooks/useDonorOverrides";
 
 const DonorDetailPage = () => {
   const { donorId } = useParams();
   const { increments } = useEmployeeIncrements();
   const { overrides } = useEmployeeOverrides();
+  const { preferenceOverrides, geoAdditions, metricOverrides } = useDonorOverrides();
 
   // Apply individual increments and profile overrides to employees
   const employees = applyEmployeeOverrides(
@@ -33,7 +35,8 @@ const DonorDetailPage = () => {
     overrides
   );
 
-  const donor = donors.find((item) => item.id === donorId);
+  const effectiveDonors = applyDonorPreferenceOverrides(donors, preferenceOverrides);
+  const donor = effectiveDonors.find((item) => item.id === donorId);
 
   if (!donor) {
     return (

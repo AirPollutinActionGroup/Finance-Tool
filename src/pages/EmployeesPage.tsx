@@ -6,10 +6,12 @@ import { donors, employees as baseEmployees, programs } from "../data/mockData";
 import { formatCurrency, formatDate, formatPercent, calculateProjectedSalary, calculateProjectedCTC } from "../utils/format";
 import { useEmployeeIncrements } from "../hooks/useEmployeeIncrements";
 import { useEmployeeOverrides, applyEmployeeOverrides } from "../hooks/useEmployeeOverrides";
+import { useDonorOverrides, applyDonorPreferenceOverrides } from "../hooks/useDonorOverrides";
 
 const EmployeesPage = () => {
   const { increments, setIncrement, resetAll, hasAnyIncrements } = useEmployeeIncrements();
   const { overrides, setOverride, getCustomFields, addCustomField, removeCustomField, allocationOverrides, setAllocation, removeAllocation } = useEmployeeOverrides();
+  const { preferenceOverrides } = useDonorOverrides();
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
   const [addingField, setAddingField] = useState(false);
   const [newFieldLabel, setNewFieldLabel] = useState("");
@@ -27,7 +29,10 @@ const EmployeesPage = () => {
     overrides
   );
 
-  const donorsByProgram = donors.reduce<Record<string, typeof donors>>(
+  // Apply donor preference overrides
+  const effectiveDonors = applyDonorPreferenceOverrides(donors, preferenceOverrides);
+
+  const donorsByProgram = effectiveDonors.reduce<Record<string, typeof effectiveDonors>>(
     (acc, donor) => {
       donor.preferences.forEach((preference) => {
         acc[preference.programId] ??= [];
@@ -83,7 +88,7 @@ const EmployeesPage = () => {
       {}
     );
 
-    const contributingDonors = donors
+    const contributingDonors = effectiveDonors
       .filter((donor) =>
         donor.preferences.some(
           (preference) => preference.programId === selectedEmployee.programId
@@ -144,7 +149,7 @@ const EmployeesPage = () => {
     // Manually added donors (in overrides but not computed)
     for (const [donorId, percent] of Object.entries(empAllocOverrides)) {
       if (!computedDonorIds.has(donorId) && percent > 0) {
-        const donor = donors.find(d => d.id === donorId);
+        const donor = effectiveDonors.find(d => d.id === donorId);
         if (donor) result.push({ donor, allocationPercent: percent, isManual: true });
       }
     }
@@ -682,7 +687,7 @@ const EmployeesPage = () => {
                     aria-label="Select donor"
                   >
                     <option value="">Select donor…</option>
-                    {donors
+                    {effectiveDonors
                       .filter(d => !mergedDonors.some(m => m.donor.id === d.id))
                       .map(d => (
                         <option key={d.id} value={d.id}>{d.name}</option>

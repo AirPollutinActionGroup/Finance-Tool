@@ -7,6 +7,7 @@ import {
 import { formatCurrency, formatPercent, calculateProjectedSalary } from "../utils/format";
 import { useEmployeeIncrements } from "../hooks/useEmployeeIncrements";
 import { useEmployeeOverrides, applyEmployeeOverrides } from "../hooks/useEmployeeOverrides";
+import { useDonorOverrides, applyDonorPreferenceOverrides } from "../hooks/useDonorOverrides";
 
 const scenarios = [
   {
@@ -84,6 +85,7 @@ const scenarios = [
 const SimulationPage = () => {
   const { increments, hasAnyIncrements } = useEmployeeIncrements();
   const { overrides } = useEmployeeOverrides();
+  const { preferenceOverrides } = useDonorOverrides();
   const [activeScenarioId, setActiveScenarioId] = useState(scenarios[0].id);
   const [salaryMultiplier, setSalaryMultiplier] = useState(1);
   const [donorMultiplier, setDonorMultiplier] = useState(1);
@@ -112,10 +114,13 @@ const SimulationPage = () => {
     overrides
   );
 
+  // Apply donor preference overrides
+  const effectiveDonors = applyDonorPreferenceOverrides(donors, preferenceOverrides);
+
   // Baseline simulation (current state) for comparison
   const baselineSimulation = useMemo(() => {
-    return runSimulation(donors, programs, baseEmployees, OPERATIONAL_OVERHEAD);
-  }, []);
+    return runSimulation(effectiveDonors, programs, baseEmployees, OPERATIONAL_OVERHEAD);
+  }, [effectiveDonors]);
 
   const simulation = useMemo(() => {
     const effectiveSalaryMultiplier =
@@ -141,7 +146,7 @@ const SimulationPage = () => {
       };
     });
 
-    const adjustedDonors = donors.map((donor) => ({
+    const adjustedDonors = effectiveDonors.map((donor) => ({
       ...donor,
       contributionAmount: Math.round(
         donor.contributionAmount * effectiveDonorMultiplier
@@ -454,7 +459,7 @@ const SimulationPage = () => {
                 return bScore - aScore;
               })
               .map((runway, index) => {
-                const donorData = donors.find(d => d.id === runway.donorId);
+                const donorData = effectiveDonors.find(d => d.id === runway.donorId);
                 const score = simulation.donorScores?.find(s => s.donorId === runway.donorId);
                 const isRecommended = index === 0;
                 
