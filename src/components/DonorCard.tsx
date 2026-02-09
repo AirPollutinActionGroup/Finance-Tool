@@ -21,6 +21,20 @@ const DonorCard = ({ donor, onDetails }: DonorCardProps) => {
         <div className="donor-card-value">
           {formatCurrency(donor.contributionAmount)}
         </div>
+        {onDetails && (
+          <div className="card-footer">
+            <button
+              type="button"
+              className="card-detail-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDetails();
+              }}
+            >
+              Details
+            </button>
+          </div>
+        )}
       </div>
     </article>
   );

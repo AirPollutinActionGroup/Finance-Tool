@@ -1,4 +1,3 @@
-import { NavLink } from "react-router-dom";
 import { useState, useMemo } from "react";
 import DonorCard from "../components/DonorCard";
 import HorizontalCarousel from "../components/HorizontalCarousel";
@@ -177,7 +176,7 @@ const DonorsPage = () => {
               }
             }}
           >
-            <DonorCard donor={donor} />
+            <DonorCard donor={donor} onDetails={() => setSelectedDonorId(donor.id)} />
           </div>
         ))}
       </HorizontalCarousel>
@@ -385,12 +384,6 @@ const DonorsPage = () => {
             </section>
 
             <div className="drawer-actions">
-              <NavLink
-                to={`/donors/${selectedDonor.id}`}
-                className="modal-link"
-              >
-                Open in full page
-              </NavLink>
               <button
                 type="button"
                 className="ghost-button"
