@@ -5,29 +5,24 @@ import Drawer from "../components/Drawer";
 import { donors, employees as baseEmployees, programs } from "../data/mockData";
 import { formatCurrency, formatDate, formatPercent, calculateProjectedSalary, calculateProjectedCTC } from "../utils/format";
 import { useEmployeeIncrements } from "../hooks/useEmployeeIncrements";
+import { useEmployeeOverrides, applyEmployeeOverrides } from "../hooks/useEmployeeOverrides";
 
 const EmployeesPage = () => {
   const { increments, setIncrement, resetAll, hasAnyIncrements } = useEmployeeIncrements();
+  const { overrides, setOverride, getCustomFields, addCustomField, removeCustomField } = useEmployeeOverrides();
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
-  const [profileOverrides, setProfileOverrides] = useState<Record<string, {
-    role?: string;
-    cityGeo?: string;
-    programId?: string;
-  }>>({});
-  const [customCompFields, setCustomCompFields] = useState<Record<string, Array<{
-    id: string;
-    label: string;
-    value: string;
-  }>>>({});
   const [addingField, setAddingField] = useState(false);
   const [newFieldLabel, setNewFieldLabel] = useState("");
   const [newFieldValue, setNewFieldValue] = useState("");
 
-  // Apply increments to employees
-  const employees = baseEmployees.map(emp => ({
-    ...emp,
-    plannedIncrement: increments[emp.id] || 0,
-  }));
+  // Apply increments and profile overrides to employees
+  const employees = applyEmployeeOverrides(
+    baseEmployees.map(emp => ({
+      ...emp,
+      plannedIncrement: increments[emp.id] || 0,
+    })),
+    overrides
+  );
 
   const donorsByProgram = donors.reduce<Record<string, typeof donors>>(
     (acc, donor) => {
@@ -135,20 +130,20 @@ const EmployeesPage = () => {
   }, [selectedEmployeeId]);
 
   const uniqueRoles = useMemo(() =>
-    Array.from(new Set(employees.map(emp => emp.role))).sort(),
-    [employees]
+    Array.from(new Set(baseEmployees.map(emp => emp.role))).sort(),
+    []
   );
 
   const uniqueLocations = useMemo(() => {
     const seen = new Map<string, { city: string; geography: string }>();
-    employees.forEach(emp => {
+    baseEmployees.forEach(emp => {
       const key = `${emp.city}|${emp.geography}`;
       if (!seen.has(key)) seen.set(key, { city: emp.city, geography: emp.geography });
     });
     return Array.from(seen.values()).sort((a, b) =>
       `${a.city}, ${a.geography}`.localeCompare(`${b.city}, ${b.geography}`)
     );
-  }, [employees]);
+  }, []);
 
   const selectStyle: React.CSSProperties = {
     background: 'var(--panel)',
@@ -345,11 +340,8 @@ const EmployeesPage = () => {
                 <div className="detail-row">
                   <span>Role</span>
                   <select
-                    value={profileOverrides[selectedEmployee.id]?.role ?? selectedEmployee.role}
-                    onChange={(e) => setProfileOverrides(prev => ({
-                      ...prev,
-                      [selectedEmployee.id]: { ...prev[selectedEmployee.id], role: e.target.value }
-                    }))}
+                    value={selectedEmployee.role}
+                    onChange={(e) => setOverride(selectedEmployee.id, { role: e.target.value })}
                     style={selectStyle}
                     aria-label="Role"
                   >
@@ -361,11 +353,8 @@ const EmployeesPage = () => {
                 <div className="detail-row">
                   <span>Location</span>
                   <select
-                    value={profileOverrides[selectedEmployee.id]?.cityGeo ?? `${selectedEmployee.city}|${selectedEmployee.geography}`}
-                    onChange={(e) => setProfileOverrides(prev => ({
-                      ...prev,
-                      [selectedEmployee.id]: { ...prev[selectedEmployee.id], cityGeo: e.target.value }
-                    }))}
+                    value={`${selectedEmployee.city}|${selectedEmployee.geography}`}
+                    onChange={(e) => setOverride(selectedEmployee.id, { cityGeo: e.target.value })}
                     style={selectStyle}
                     aria-label="Location"
                   >
@@ -379,11 +368,8 @@ const EmployeesPage = () => {
                 <div className="detail-row">
                   <span>Program</span>
                   <select
-                    value={profileOverrides[selectedEmployee.id]?.programId ?? selectedEmployee.programId}
-                    onChange={(e) => setProfileOverrides(prev => ({
-                      ...prev,
-                      [selectedEmployee.id]: { ...prev[selectedEmployee.id], programId: e.target.value }
-                    }))}
+                    value={selectedEmployee.programId}
+                    onChange={(e) => setOverride(selectedEmployee.id, { programId: e.target.value })}
                     style={selectStyle}
                     aria-label="Program"
                   >
@@ -482,17 +468,14 @@ const EmployeesPage = () => {
                 )}
 
                 {/* Custom compensation fields */}
-                {(customCompFields[selectedEmployee.id] ?? []).map(field => (
+                {getCustomFields(selectedEmployee.id).map(field => (
                   <div className="detail-row" key={field.id}>
                     <span>{field.label}</span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
                       {field.value}
                       <button
                         type="button"
-                        onClick={() => setCustomCompFields(prev => ({
-                          ...prev,
-                          [selectedEmployee.id]: (prev[selectedEmployee.id] ?? []).filter(f => f.id !== field.id)
-                        }))}
+                        onClick={() => removeCustomField(selectedEmployee.id, field.id)}
                         style={{
                           background: 'none',
                           border: 'none',
@@ -538,13 +521,11 @@ const EmployeesPage = () => {
                       className="table-action"
                       onClick={() => {
                         if (newFieldLabel.trim() && newFieldValue.trim()) {
-                          setCustomCompFields(prev => ({
-                            ...prev,
-                            [selectedEmployee.id]: [
-                              ...(prev[selectedEmployee.id] ?? []),
-                              { id: `custom-${Date.now()}`, label: newFieldLabel.trim(), value: newFieldValue.trim() }
-                            ]
-                          }));
+                          addCustomField(selectedEmployee.id, {
+                            id: `custom-${Date.now()}`,
+                            label: newFieldLabel.trim(),
+                            value: newFieldValue.trim(),
+                          });
                           setNewFieldLabel("");
                           setNewFieldValue("");
                           setAddingField(false);

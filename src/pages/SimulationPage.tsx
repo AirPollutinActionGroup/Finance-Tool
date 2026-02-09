@@ -6,6 +6,7 @@ import {
 } from "../simulation/engine";
 import { formatCurrency, formatPercent, calculateProjectedSalary } from "../utils/format";
 import { useEmployeeIncrements } from "../hooks/useEmployeeIncrements";
+import { useEmployeeOverrides, applyEmployeeOverrides } from "../hooks/useEmployeeOverrides";
 
 const scenarios = [
   {
@@ -82,6 +83,7 @@ const scenarios = [
 
 const SimulationPage = () => {
   const { increments, hasAnyIncrements } = useEmployeeIncrements();
+  const { overrides } = useEmployeeOverrides();
   const [activeScenarioId, setActiveScenarioId] = useState(scenarios[0].id);
   const [salaryMultiplier, setSalaryMultiplier] = useState(1);
   const [donorMultiplier, setDonorMultiplier] = useState(1);
@@ -91,21 +93,24 @@ const SimulationPage = () => {
     (scenario) => scenario.id === activeScenarioId
   )!;
 
-  // Apply individual increments to create base employees
-  const employees = baseEmployees.map(emp => {
-    const increment = increments[emp.id] || 0;
-    if (increment > 0) {
-      const projectedMonthly = calculateProjectedSalary(emp.monthlySalary, increment);
-      return {
-        ...emp,
-        monthlySalary: projectedMonthly,
-        pfContribution: Math.round(projectedMonthly * 0.12),
-        tdsDeduction: Math.round(projectedMonthly * 0.1),
-        plannedIncrement: increment,
-      };
-    }
-    return { ...emp, plannedIncrement: 0 };
-  });
+  // Apply individual increments and profile overrides to create base employees
+  const employees = applyEmployeeOverrides(
+    baseEmployees.map(emp => {
+      const increment = increments[emp.id] || 0;
+      if (increment > 0) {
+        const projectedMonthly = calculateProjectedSalary(emp.monthlySalary, increment);
+        return {
+          ...emp,
+          monthlySalary: projectedMonthly,
+          pfContribution: Math.round(projectedMonthly * 0.12),
+          tdsDeduction: Math.round(projectedMonthly * 0.1),
+          plannedIncrement: increment,
+        };
+      }
+      return { ...emp, plannedIncrement: 0 };
+    }),
+    overrides
+  );
 
   // Baseline simulation (current state) for comparison
   const baselineSimulation = useMemo(() => {

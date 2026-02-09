@@ -2,12 +2,15 @@ import { NavLink, useParams } from "react-router-dom";
 import { donors, employees, programs } from "../data/mockData";
 import { formatCurrency, formatDate, formatPercent, calculateProjectedCTC } from "../utils/format";
 import { useEmployeeIncrements } from "../hooks/useEmployeeIncrements";
+import { useEmployeeOverrides, applyEmployeeOverrides } from "../hooks/useEmployeeOverrides";
 
 const EmployeeDetailPage = () => {
   const { employeeId } = useParams();
   const { getIncrement, setIncrement, resetEmployee } = useEmployeeIncrements();
+  const { overrides, getCustomFields } = useEmployeeOverrides();
 
-  const employee = employees.find((item) => item.id === employeeId);
+  const allEmployees = applyEmployeeOverrides(employees, overrides);
+  const employee = allEmployees.find((item) => item.id === employeeId);
 
   if (!employee) {
     return (
@@ -61,7 +64,7 @@ const EmployeeDetailPage = () => {
   };
 
   // Group employees by program for score calculation
-  const employeesByProgram = employees.reduce<Record<string, typeof employees>>(
+  const employeesByProgram = allEmployees.reduce<Record<string, typeof allEmployees>>(
     (acc, emp) => {
       acc[emp.programId] ??= [];
       acc[emp.programId].push(emp);
@@ -230,6 +233,14 @@ const EmployeeDetailPage = () => {
               </div>
             )}
           </div>
+
+          {/* Custom compensation fields (shared with drawer) */}
+          {getCustomFields(employee.id).map(field => (
+            <div className="detail-row" key={field.id}>
+              <span>{field.label}</span>
+              <span>{field.value}</span>
+            </div>
+          ))}
         </section>
         <section className="detail-card">
           <h2>Donor Contributions</h2>

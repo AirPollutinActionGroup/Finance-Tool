@@ -10,26 +10,31 @@ import {
 } from "../data/mockData";
 import { formatCurrency, formatDate, formatPercent, calculateProjectedSalary } from "../utils/format";
 import { useEmployeeIncrements } from "../hooks/useEmployeeIncrements";
+import { useEmployeeOverrides, applyEmployeeOverrides } from "../hooks/useEmployeeOverrides";
 
 const DonorsPage = () => {
   const { increments } = useEmployeeIncrements();
+  const { overrides } = useEmployeeOverrides();
   const [selectedDonorId, setSelectedDonorId] = useState<string | null>(null);
 
-  // Apply individual increments to employees
-  const employees = baseEmployees.map(emp => {
-    const increment = increments[emp.id] || 0;
-    if (increment > 0) {
-      const projectedMonthly = calculateProjectedSalary(emp.monthlySalary, increment);
-      return {
-        ...emp,
-        monthlySalary: projectedMonthly,
-        pfContribution: Math.round(projectedMonthly * 0.12),
-        tdsDeduction: Math.round(projectedMonthly * 0.1),
-        plannedIncrement: increment,
-      };
-    }
-    return { ...emp, plannedIncrement: 0 };
-  });
+  // Apply individual increments and profile overrides to employees
+  const employees = applyEmployeeOverrides(
+    baseEmployees.map(emp => {
+      const increment = increments[emp.id] || 0;
+      if (increment > 0) {
+        const projectedMonthly = calculateProjectedSalary(emp.monthlySalary, increment);
+        return {
+          ...emp,
+          monthlySalary: projectedMonthly,
+          pfContribution: Math.round(projectedMonthly * 0.12),
+          tdsDeduction: Math.round(projectedMonthly * 0.1),
+          plannedIncrement: increment,
+        };
+      }
+      return { ...emp, plannedIncrement: 0 };
+    }),
+    overrides
+  );
 
   const selectedDonor = donors.find((donor) => donor.id === selectedDonorId);
 
