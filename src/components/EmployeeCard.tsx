@@ -33,6 +33,20 @@ const EmployeeCard = ({
             <span>{donorCount} donors</span>
           ) : null}
         </div>
+        {onDetails && (
+          <div className="card-footer">
+            <button
+              type="button"
+              className="card-detail-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDetails();
+              }}
+            >
+              Details
+            </button>
+          </div>
+        )}
       </div>
     </article>
   );

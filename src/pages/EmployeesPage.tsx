@@ -1,4 +1,3 @@
-import { NavLink } from "react-router-dom";
 import { useState, useMemo } from "react";
 import EmployeeCard from "../components/EmployeeCard";
 import HorizontalCarousel from "../components/HorizontalCarousel";
@@ -144,6 +143,7 @@ const EmployeesPage = () => {
             <EmployeeCard
               employee={employee}
               donorCount={donorsByProgram[employee.programId]?.length ?? 0}
+              onDetails={() => setSelectedEmployeeId(employee.id)}
             />
           </div>
         ))}
@@ -427,12 +427,6 @@ const EmployeesPage = () => {
             </section>
 
             <div className="drawer-actions">
-              <NavLink
-                to={`/employees/${selectedEmployee.id}`}
-                className="modal-link"
-              >
-                Open in full page
-              </NavLink>
               <button
                 type="button"
                 className="ghost-button"
