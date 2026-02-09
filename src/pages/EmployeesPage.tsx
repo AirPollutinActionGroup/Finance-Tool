@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import EmployeeCard from "../components/EmployeeCard";
 import HorizontalCarousel from "../components/HorizontalCarousel";
 import Drawer from "../components/Drawer";
@@ -9,7 +9,20 @@ import { useEmployeeIncrements } from "../hooks/useEmployeeIncrements";
 const EmployeesPage = () => {
   const { increments, setIncrement, resetAll, hasAnyIncrements } = useEmployeeIncrements();
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
-  
+  const [profileOverrides, setProfileOverrides] = useState<Record<string, {
+    role?: string;
+    cityGeo?: string;
+    programId?: string;
+  }>>({});
+  const [customCompFields, setCustomCompFields] = useState<Record<string, Array<{
+    id: string;
+    label: string;
+    value: string;
+  }>>>({});
+  const [addingField, setAddingField] = useState(false);
+  const [newFieldLabel, setNewFieldLabel] = useState("");
+  const [newFieldValue, setNewFieldValue] = useState("");
+
   // Apply increments to employees
   const employees = baseEmployees.map(emp => ({
     ...emp,
@@ -113,6 +126,52 @@ const EmployeesPage = () => {
       contributingDonors,
     };
   }, [selectedEmployee, employees, increments]);
+
+  // Reset add-field form when selected employee changes
+  useEffect(() => {
+    setAddingField(false);
+    setNewFieldLabel("");
+    setNewFieldValue("");
+  }, [selectedEmployeeId]);
+
+  const uniqueRoles = useMemo(() =>
+    Array.from(new Set(employees.map(emp => emp.role))).sort(),
+    [employees]
+  );
+
+  const uniqueLocations = useMemo(() => {
+    const seen = new Map<string, { city: string; geography: string }>();
+    employees.forEach(emp => {
+      const key = `${emp.city}|${emp.geography}`;
+      if (!seen.has(key)) seen.set(key, { city: emp.city, geography: emp.geography });
+    });
+    return Array.from(seen.values()).sort((a, b) =>
+      `${a.city}, ${a.geography}`.localeCompare(`${b.city}, ${b.geography}`)
+    );
+  }, [employees]);
+
+  const selectStyle: React.CSSProperties = {
+    background: 'var(--panel)',
+    color: 'var(--ink)',
+    border: '1px solid var(--border)',
+    borderRadius: 'var(--radius-sm)',
+    padding: 'var(--space-xs) var(--space-sm)',
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    cursor: 'pointer',
+    minWidth: '140px',
+  };
+
+  const fieldInputStyle: React.CSSProperties = {
+    flex: 1,
+    minWidth: '100px',
+    padding: 'var(--space-xs) var(--space-sm)',
+    background: 'var(--panel)',
+    color: 'var(--ink)',
+    border: '1px solid var(--border)',
+    borderRadius: 'var(--radius-sm)',
+    fontSize: '0.875rem',
+  };
 
   return (
     <section className="page-section">
@@ -285,17 +344,53 @@ const EmployeesPage = () => {
                 <h2>Profile</h2>
                 <div className="detail-row">
                   <span>Role</span>
-                  <span>{selectedEmployee.role}</span>
+                  <select
+                    value={profileOverrides[selectedEmployee.id]?.role ?? selectedEmployee.role}
+                    onChange={(e) => setProfileOverrides(prev => ({
+                      ...prev,
+                      [selectedEmployee.id]: { ...prev[selectedEmployee.id], role: e.target.value }
+                    }))}
+                    style={selectStyle}
+                    aria-label="Role"
+                  >
+                    {uniqueRoles.map(role => (
+                      <option key={role} value={role}>{role}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className="detail-row">
                   <span>Location</span>
-                  <span>
-                    {selectedEmployee.city}, {selectedEmployee.geography}
-                  </span>
+                  <select
+                    value={profileOverrides[selectedEmployee.id]?.cityGeo ?? `${selectedEmployee.city}|${selectedEmployee.geography}`}
+                    onChange={(e) => setProfileOverrides(prev => ({
+                      ...prev,
+                      [selectedEmployee.id]: { ...prev[selectedEmployee.id], cityGeo: e.target.value }
+                    }))}
+                    style={selectStyle}
+                    aria-label="Location"
+                  >
+                    {uniqueLocations.map(loc => (
+                      <option key={`${loc.city}|${loc.geography}`} value={`${loc.city}|${loc.geography}`}>
+                        {loc.city}, {loc.geography}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="detail-row">
                   <span>Program</span>
-                  <span>{selectedProgram}</span>
+                  <select
+                    value={profileOverrides[selectedEmployee.id]?.programId ?? selectedEmployee.programId}
+                    onChange={(e) => setProfileOverrides(prev => ({
+                      ...prev,
+                      [selectedEmployee.id]: { ...prev[selectedEmployee.id], programId: e.target.value }
+                    }))}
+                    style={selectStyle}
+                    aria-label="Program"
+                  >
+                    {programs.map(program => (
+                      <option key={program.id} value={program.id}>{program.name}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className="detail-row">
                   <span>Joined</span>
@@ -384,6 +479,109 @@ const EmployeesPage = () => {
                       <span>{formatCurrency(employeeDetailData.annualTDS)}</span>
                     </div>
                   </>
+                )}
+
+                {/* Custom compensation fields */}
+                {(customCompFields[selectedEmployee.id] ?? []).map(field => (
+                  <div className="detail-row" key={field.id}>
+                    <span>{field.label}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
+                      {field.value}
+                      <button
+                        type="button"
+                        onClick={() => setCustomCompFields(prev => ({
+                          ...prev,
+                          [selectedEmployee.id]: (prev[selectedEmployee.id] ?? []).filter(f => f.id !== field.id)
+                        }))}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--ink-muted)',
+                          cursor: 'pointer',
+                          fontSize: '0.875rem',
+                          padding: '0 var(--space-xs)',
+                        }}
+                        aria-label={`Remove ${field.label}`}
+                      >
+                        ✕
+                      </button>
+                    </span>
+                  </div>
+                ))}
+
+                {addingField ? (
+                  <div style={{
+                    display: 'flex',
+                    gap: 'var(--space-sm)',
+                    alignItems: 'center',
+                    marginTop: 'var(--space-sm)',
+                    flexWrap: 'wrap',
+                  }}>
+                    <input
+                      type="text"
+                      placeholder="Label"
+                      value={newFieldLabel}
+                      onChange={(e) => setNewFieldLabel(e.target.value)}
+                      style={fieldInputStyle}
+                      aria-label="Field label"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Value"
+                      value={newFieldValue}
+                      onChange={(e) => setNewFieldValue(e.target.value)}
+                      style={fieldInputStyle}
+                      aria-label="Field value"
+                    />
+                    <button
+                      type="button"
+                      className="table-action"
+                      onClick={() => {
+                        if (newFieldLabel.trim() && newFieldValue.trim()) {
+                          setCustomCompFields(prev => ({
+                            ...prev,
+                            [selectedEmployee.id]: [
+                              ...(prev[selectedEmployee.id] ?? []),
+                              { id: `custom-${Date.now()}`, label: newFieldLabel.trim(), value: newFieldValue.trim() }
+                            ]
+                          }));
+                          setNewFieldLabel("");
+                          setNewFieldValue("");
+                          setAddingField(false);
+                        }
+                      }}
+                    >
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      style={{
+                        background: 'none',
+                        border: '1px solid var(--border)',
+                        color: 'var(--ink-muted)',
+                        borderRadius: 'var(--radius-sm)',
+                        padding: 'var(--space-xs) var(--space-sm)',
+                        fontSize: '0.8125rem',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() => {
+                        setAddingField(false);
+                        setNewFieldLabel("");
+                        setNewFieldValue("");
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="ghost-button"
+                    onClick={() => setAddingField(true)}
+                    style={{ marginTop: 'var(--space-sm)', fontSize: '0.8125rem', padding: 'var(--space-xs) var(--space-md)' }}
+                  >
+                    + Add Field
+                  </button>
                 )}
               </section>
             </div>
