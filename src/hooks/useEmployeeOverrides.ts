@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 const OVERRIDES_KEY = "fundflow-employee-overrides";
 const CUSTOM_FIELDS_KEY = "fundflow-employee-custom-fields";
+const ALLOCATIONS_KEY = "fundflow-allocation-overrides";
 
 export type EmployeeOverride = {
   role?: string;
@@ -26,6 +27,12 @@ export const useEmployeeOverrides = () => {
     return stored ? JSON.parse(stored) : {};
   });
 
+  // allocationOverrides[employeeId][donorId] = percentage
+  const [allocationOverrides, setAllocationOverrides] = useState<Record<string, Record<string, number>>>(() => {
+    const stored = localStorage.getItem(ALLOCATIONS_KEY);
+    return stored ? JSON.parse(stored) : {};
+  });
+
   // Persist to localStorage
   useEffect(() => {
     localStorage.setItem(OVERRIDES_KEY, JSON.stringify(overrides));
@@ -34,6 +41,10 @@ export const useEmployeeOverrides = () => {
   useEffect(() => {
     localStorage.setItem(CUSTOM_FIELDS_KEY, JSON.stringify(customCompFields));
   }, [customCompFields]);
+
+  useEffect(() => {
+    localStorage.setItem(ALLOCATIONS_KEY, JSON.stringify(allocationOverrides));
+  }, [allocationOverrides]);
 
   // Cross-tab synchronization
   useEffect(() => {
@@ -44,6 +55,9 @@ export const useEmployeeOverrides = () => {
         }
         if (e.key === CUSTOM_FIELDS_KEY && e.newValue) {
           setCustomCompFields(JSON.parse(e.newValue));
+        }
+        if (e.key === ALLOCATIONS_KEY && e.newValue) {
+          setAllocationOverrides(JSON.parse(e.newValue));
         }
       } catch (error) {
         console.error("Failed to parse employee overrides from storage:", error);
@@ -83,14 +97,40 @@ export const useEmployeeOverrides = () => {
     }));
   };
 
+  const setAllocation = (employeeId: string, donorId: string, percent: number) => {
+    setAllocationOverrides((prev) => ({
+      ...prev,
+      [employeeId]: { ...prev[employeeId], [donorId]: percent },
+    }));
+  };
+
+  const removeAllocation = (employeeId: string, donorId: string) => {
+    setAllocationOverrides((prev) => {
+      const updated = { ...prev };
+      if (updated[employeeId]) {
+        const empAllocs = { ...updated[employeeId] };
+        delete empAllocs[donorId];
+        if (Object.keys(empAllocs).length === 0) {
+          delete updated[employeeId];
+        } else {
+          updated[employeeId] = empAllocs;
+        }
+      }
+      return updated;
+    });
+  };
+
   return {
     overrides,
     customCompFields,
+    allocationOverrides,
     setOverride,
     getOverride,
     getCustomFields,
     addCustomField,
     removeCustomField,
+    setAllocation,
+    removeAllocation,
   };
 };
 

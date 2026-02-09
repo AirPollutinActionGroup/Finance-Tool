@@ -9,11 +9,14 @@ import { useEmployeeOverrides, applyEmployeeOverrides } from "../hooks/useEmploy
 
 const EmployeesPage = () => {
   const { increments, setIncrement, resetAll, hasAnyIncrements } = useEmployeeIncrements();
-  const { overrides, setOverride, getCustomFields, addCustomField, removeCustomField } = useEmployeeOverrides();
+  const { overrides, setOverride, getCustomFields, addCustomField, removeCustomField, allocationOverrides, setAllocation, removeAllocation } = useEmployeeOverrides();
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
   const [addingField, setAddingField] = useState(false);
   const [newFieldLabel, setNewFieldLabel] = useState("");
   const [newFieldValue, setNewFieldValue] = useState("");
+  const [addingDonor, setAddingDonor] = useState(false);
+  const [newDonorId, setNewDonorId] = useState("");
+  const [newDonorPercent, setNewDonorPercent] = useState("");
 
   // Apply increments and profile overrides to employees
   const employees = applyEmployeeOverrides(
@@ -122,11 +125,41 @@ const EmployeesPage = () => {
     };
   }, [selectedEmployee, employees, increments]);
 
-  // Reset add-field form when selected employee changes
+  // Merge computed donor allocations with overrides for the selected employee
+  const mergedDonors = useMemo(() => {
+    if (!selectedEmployee || !employeeDetailData) return [];
+    const empAllocOverrides = allocationOverrides[selectedEmployee.id] || {};
+    const computedDonorIds = new Set(employeeDetailData.contributingDonors.map(d => d.donor.id));
+
+    // Computed donors with override applied if present
+    const result = employeeDetailData.contributingDonors.map(({ donor, allocationPercent }) => {
+      const overrideVal = empAllocOverrides[donor.id];
+      return {
+        donor,
+        allocationPercent: overrideVal !== undefined ? overrideVal : allocationPercent,
+        isManual: false,
+      };
+    });
+
+    // Manually added donors (in overrides but not computed)
+    for (const [donorId, percent] of Object.entries(empAllocOverrides)) {
+      if (!computedDonorIds.has(donorId) && percent > 0) {
+        const donor = donors.find(d => d.id === donorId);
+        if (donor) result.push({ donor, allocationPercent: percent, isManual: true });
+      }
+    }
+
+    return result.filter(d => d.allocationPercent > 0);
+  }, [selectedEmployee, employeeDetailData, allocationOverrides]);
+
+  // Reset forms when selected employee changes
   useEffect(() => {
     setAddingField(false);
     setNewFieldLabel("");
     setNewFieldValue("");
+    setAddingDonor(false);
+    setNewDonorId("");
+    setNewDonorPercent("");
   }, [selectedEmployeeId]);
 
   const uniqueRoles = useMemo(() =>
@@ -579,11 +612,12 @@ const EmployeesPage = () => {
                       <th>Donor</th>
                       <th>Type</th>
                       <th>Allocation %</th>
+                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {employeeDetailData.contributingDonors.length > 0 ? (
-                      employeeDetailData.contributingDonors.map(({ donor, allocationPercent }) => (
+                    {mergedDonors.length > 0 ? (
+                      mergedDonors.map(({ donor, allocationPercent, isManual }) => (
                         <tr key={donor.id}>
                           <td>
                             <div className="table-cell-title">{donor.name}</div>
@@ -592,17 +626,124 @@ const EmployeesPage = () => {
                             </div>
                           </td>
                           <td>{donor.type}</td>
-                          <td>{formatPercent(allocationPercent)}</td>
+                          <td>
+                            <input
+                              type="number"
+                              min="0"
+                              max="100"
+                              step="0.1"
+                              value={allocationPercent}
+                              onChange={(e) => setAllocation(selectedEmployee.id, donor.id, Number(e.target.value))}
+                              className="increment-input"
+                              aria-label={`Allocation for ${donor.name}`}
+                            />
+                          </td>
+                          <td>
+                            {isManual && (
+                              <button
+                                type="button"
+                                onClick={() => removeAllocation(selectedEmployee.id, donor.id)}
+                                style={{
+                                  background: 'none',
+                                  border: 'none',
+                                  color: 'var(--ink-muted)',
+                                  cursor: 'pointer',
+                                  fontSize: '0.875rem',
+                                }}
+                                aria-label={`Remove ${donor.name}`}
+                              >
+                                ✕
+                              </button>
+                            )}
+                          </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={3}>No donors allocated to this employee's program.</td>
+                        <td colSpan={4}>No donors allocated to this employee's program.</td>
                       </tr>
                     )}
                   </tbody>
                 </table>
               </div>
+
+              {addingDonor ? (
+                <div style={{
+                  display: 'flex',
+                  gap: 'var(--space-sm)',
+                  alignItems: 'center',
+                  marginTop: 'var(--space-sm)',
+                  flexWrap: 'wrap',
+                }}>
+                  <select
+                    value={newDonorId}
+                    onChange={(e) => setNewDonorId(e.target.value)}
+                    style={selectStyle}
+                    aria-label="Select donor"
+                  >
+                    <option value="">Select donor…</option>
+                    {donors
+                      .filter(d => !mergedDonors.some(m => m.donor.id === d.id))
+                      .map(d => (
+                        <option key={d.id} value={d.id}>{d.name}</option>
+                      ))}
+                  </select>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    placeholder="%"
+                    value={newDonorPercent}
+                    onChange={(e) => setNewDonorPercent(e.target.value)}
+                    className="increment-input"
+                    aria-label="Allocation percentage"
+                  />
+                  <button
+                    type="button"
+                    className="table-action"
+                    onClick={() => {
+                      const pct = Number(newDonorPercent);
+                      if (newDonorId && pct > 0) {
+                        setAllocation(selectedEmployee.id, newDonorId, pct);
+                        setNewDonorId("");
+                        setNewDonorPercent("");
+                        setAddingDonor(false);
+                      }
+                    }}
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    style={{
+                      background: 'none',
+                      border: '1px solid var(--border)',
+                      color: 'var(--ink-muted)',
+                      borderRadius: 'var(--radius-sm)',
+                      padding: 'var(--space-xs) var(--space-sm)',
+                      fontSize: '0.8125rem',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => {
+                      setAddingDonor(false);
+                      setNewDonorId("");
+                      setNewDonorPercent("");
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="ghost-button"
+                  onClick={() => setAddingDonor(true)}
+                  style={{ marginTop: 'var(--space-sm)', fontSize: '0.8125rem', padding: 'var(--space-xs) var(--space-md)' }}
+                >
+                  + Add Donor
+                </button>
+              )}
             </section>
 
             <div className="drawer-actions">

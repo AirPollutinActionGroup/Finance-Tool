@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import DonorCard from "../components/DonorCard";
 import HorizontalCarousel from "../components/HorizontalCarousel";
 import Drawer from "../components/Drawer";
@@ -14,8 +14,11 @@ import { useEmployeeOverrides, applyEmployeeOverrides } from "../hooks/useEmploy
 
 const DonorsPage = () => {
   const { increments } = useEmployeeIncrements();
-  const { overrides } = useEmployeeOverrides();
+  const { overrides, allocationOverrides, setAllocation, removeAllocation } = useEmployeeOverrides();
   const [selectedDonorId, setSelectedDonorId] = useState<string | null>(null);
+  const [addingEmployee, setAddingEmployee] = useState(false);
+  const [newEmployeeId, setNewEmployeeId] = useState("");
+  const [newEmployeePercent, setNewEmployeePercent] = useState("");
 
   // Apply individual increments and profile overrides to employees
   const employees = applyEmployeeOverrides(
@@ -154,6 +157,44 @@ const DonorsPage = () => {
       recentMoves,
     };
   }, [selectedDonor, employees]);
+
+  // Merge computed employee allocations with overrides for the selected donor
+  const mergedEmployees = useMemo(() => {
+    if (!selectedDonor || !donorDetailData) return [];
+    const computedEmpIds = new Set(donorDetailData.allocatedEmployeeRows.map(r => r.employee.id));
+
+    // Computed employees with override applied if present
+    const result = donorDetailData.allocatedEmployeeRows.map((row) => {
+      const empOverrides = allocationOverrides[row.employee.id] || {};
+      const overrideVal = empOverrides[selectedDonor.id];
+      return {
+        ...row,
+        allocationPercent: overrideVal !== undefined ? overrideVal : row.allocationPercent,
+        isManual: false,
+      };
+    });
+
+    // Manually added employees (in overrides but not computed)
+    for (const [empId, donorAllocs] of Object.entries(allocationOverrides)) {
+      const percent = donorAllocs[selectedDonor.id];
+      if (percent > 0 && !computedEmpIds.has(empId)) {
+        const emp = employees.find(e => e.id === empId);
+        if (emp) {
+          const programName = programs.find(p => p.id === emp.programId)?.name ?? "Program";
+          result.push({ employee: emp, programName, allocationPercent: percent, isManual: true });
+        }
+      }
+    }
+
+    return result.filter(r => r.allocationPercent > 0);
+  }, [selectedDonor, donorDetailData, allocationOverrides, employees]);
+
+  // Reset forms when selected donor changes
+  useEffect(() => {
+    setAddingEmployee(false);
+    setNewEmployeeId("");
+    setNewEmployeePercent("");
+  }, [selectedDonorId]);
 
   return (
     <section className="page-section">
@@ -339,25 +380,149 @@ const DonorsPage = () => {
                     <tr>
                       <th>Employee</th>
                       <th>Allocation %</th>
+                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {donorDetailData.allocatedEmployeeRows.map((row) => (
-                      <tr key={row.employee.id}>
-                        <td>
-                          <div className="table-cell-title">
-                            {row.employee.name}
-                          </div>
-                          <div className="table-cell-subtitle">
-                            {row.employee.role} · {row.programName}
-                          </div>
-                        </td>
-                        <td>{formatPercent(row.allocationPercent)}</td>
+                    {mergedEmployees.length > 0 ? (
+                      mergedEmployees.map((row) => (
+                        <tr key={row.employee.id}>
+                          <td>
+                            <div className="table-cell-title">
+                              {row.employee.name}
+                            </div>
+                            <div className="table-cell-subtitle">
+                              {row.employee.role} · {row.programName}
+                            </div>
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              min="0"
+                              max="100"
+                              step="0.1"
+                              value={row.allocationPercent}
+                              onChange={(e) => setAllocation(row.employee.id, selectedDonor.id, Number(e.target.value))}
+                              className="increment-input"
+                              aria-label={`Allocation for ${row.employee.name}`}
+                            />
+                          </td>
+                          <td>
+                            {row.isManual && (
+                              <button
+                                type="button"
+                                onClick={() => removeAllocation(row.employee.id, selectedDonor.id)}
+                                style={{
+                                  background: 'none',
+                                  border: 'none',
+                                  color: 'var(--ink-muted)',
+                                  cursor: 'pointer',
+                                  fontSize: '0.875rem',
+                                }}
+                                aria-label={`Remove ${row.employee.name}`}
+                              >
+                                ✕
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={3}>No employees allocated to this donor.</td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>
+
+              {addingEmployee ? (
+                <div style={{
+                  display: 'flex',
+                  gap: 'var(--space-sm)',
+                  alignItems: 'center',
+                  marginTop: 'var(--space-sm)',
+                  flexWrap: 'wrap',
+                }}>
+                  <select
+                    value={newEmployeeId}
+                    onChange={(e) => setNewEmployeeId(e.target.value)}
+                    style={{
+                      background: 'var(--panel)',
+                      color: 'var(--ink)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--radius-sm)',
+                      padding: 'var(--space-xs) var(--space-sm)',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      minWidth: '140px',
+                    }}
+                    aria-label="Select employee"
+                  >
+                    <option value="">Select employee…</option>
+                    {employees
+                      .filter(e => !mergedEmployees.some(m => m.employee.id === e.id))
+                      .map(e => (
+                        <option key={e.id} value={e.id}>{e.name}</option>
+                      ))}
+                  </select>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    placeholder="%"
+                    value={newEmployeePercent}
+                    onChange={(e) => setNewEmployeePercent(e.target.value)}
+                    className="increment-input"
+                    aria-label="Allocation percentage"
+                  />
+                  <button
+                    type="button"
+                    className="table-action"
+                    onClick={() => {
+                      const pct = Number(newEmployeePercent);
+                      if (newEmployeeId && pct > 0) {
+                        setAllocation(newEmployeeId, selectedDonor.id, pct);
+                        setNewEmployeeId("");
+                        setNewEmployeePercent("");
+                        setAddingEmployee(false);
+                      }
+                    }}
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    style={{
+                      background: 'none',
+                      border: '1px solid var(--border)',
+                      color: 'var(--ink-muted)',
+                      borderRadius: 'var(--radius-sm)',
+                      padding: 'var(--space-xs) var(--space-sm)',
+                      fontSize: '0.8125rem',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => {
+                      setAddingEmployee(false);
+                      setNewEmployeeId("");
+                      setNewEmployeePercent("");
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="ghost-button"
+                  onClick={() => setAddingEmployee(true)}
+                  style={{ marginTop: 'var(--space-sm)', fontSize: '0.8125rem', padding: 'var(--space-xs) var(--space-md)' }}
+                >
+                  + Add Employee
+                </button>
+              )}
             </section>
 
             <section className="detail-card">
